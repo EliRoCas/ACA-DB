@@ -1,0 +1,83 @@
+:root {
+  --primary: #0056b3; /* Azul Cobalto */
+  --accent: #00d4ff; /* Cian Eléctrico */
+  --background: #ffffff; /* Blanco Níveo */
+  --border: #e9ecef; /* Gris Claro */
+  --primary-text: #212529; /* Gris Oscuro */
+  --radius: 1rem; /* Radio de borde para tarjetas */
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+.layout {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+body {
+  background-color: var(--background);
+}
+
+.layout {
+  display: grid;
+  grid-template-rows: auto 1fr auto;
+  grid-template-areas:
+    "header header"
+    " main main"
+    "footer footer";
+  justify-content: space-between;
+}
+
+.navbar {
+  grid-area: header;
+}
+
+.content {
+  grid-area: main;
+}
+
+.footer {
+  grid-area: footer;
+}
+
+.navbar-custom {
+  background-color: var(--primary);
+}
+
+.navbar-custom .navbar-brand,
+.navbar-custom .nav-link {
+  color: var(--background);
+}
+
+.navbar-custom .nav-link:hover {
+  color: var(--accent);
+}
+
+.btn-primary-custom {
+  background-color: var(--primary);
+  border: none;
+}
+
+.btn-primary-custom:hover {
+  background-color: var(--accent);
+  color: var(--primary-text);
+}
+
+.card-custom {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+}
+
+footer {
+  margin-top: 50px;
+  padding: 20px 0;
+  border-top: 1px solid var(--border);
+  text-align: center;
+  font-size: 14px;
+  color: var(--primary-text);
+}

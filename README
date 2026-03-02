@@ -1,0 +1,23 @@
+Azul Cobalto (#0056B3) - El Color de Acción:
+
+Uso: Úsalo exclusivamente para el botón principal de "Registrarse" o "Comenzar Entrenamiento".
+
+Por qué: Es un color fuerte que resalta sobre fondos claros, indicando "haz clic aquí". También úsalo en los títulos principales (H1) para dar autoridad.
+
+Cian Eléctrico (#00D4FF) - Guía Visual:
+
+Uso: Úsalo en el estado "hover" (cuando pasas el mouse por encima del botón) o en elementos de progreso, como barras de pasos (ej: "Paso 1 de 3").
+
+Por qué: Es un color energético que ayuda a que el usuario sepa qué está seleccionando sin ser tan agresivo como el rojo o el naranja.
+
+Blanco Níveo (#FFFFFF) - Fondo:
+
+Uso: Este es el fondo de toda la página.
+
+Por qué: Mantiene la sensación de "gimnasio limpio" y salud.
+
+Gris Claro (#E9ECEF) - Estructura:
+
+Uso: Úsalo en los bordes de los campos de texto (input fields) y líneas divisorias sutiles.
+
+Por qué: Delimita el espacio de registro sin saturar la vista con líneas negras pesadas.
