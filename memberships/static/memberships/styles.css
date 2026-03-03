@@ -5,6 +5,7 @@
   --border: #e9ecef; /* Gris Claro */
   --primary-text: #212529; /* Gris Oscuro */
   --radius: 1rem; /* Radio de borde para tarjetas */
+  --secondary: #6c757d; /* Gris Secundario */
 }
 
 * {
