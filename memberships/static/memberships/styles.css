@@ -6,10 +6,16 @@
   --primary-text: #212529; /* Gris Oscuro */
   --radius: 1rem; /* Radio de borde para tarjetas */
   --secondary: #6c757d; /* Gris Secundario */
+  --text: #0f172a;
+  --muted: #64748b;
+  --danger: #b42318;
+  --shadow: 0 10px 28px rgba(2, 6, 23, 0.08);
 }
 
 * {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 html,
@@ -31,7 +37,6 @@ body {
     "header header"
     " main main"
     "footer footer";
-  justify-content: space-between;
 }
 
 .navbar {
@@ -40,6 +45,9 @@ body {
 
 .content {
   grid-area: main;
+  overflow-y: auto;
+  width: 100%;
+  margin: 0 !important;
 }
 
 .footer {
@@ -59,21 +67,6 @@ body {
   color: var(--accent);
 }
 
-.btn-primary-custom {
-  background-color: var(--primary);
-  border: none;
-}
-
-.btn-primary-custom:hover {
-  background-color: var(--accent);
-  color: var(--primary-text);
-}
-
-.card-custom {
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
-}
-
 footer {
   margin-top: 50px;
   padding: 20px 0;
@@ -81,4 +74,143 @@ footer {
   text-align: center;
   font-size: 14px;
   color: var(--primary-text);
+}
+
+/* ====== Card base ====== */
+.card-custom {
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+}
+
+/* ====== Buttons ====== */
+.btn-primary-custom {
+  background: var(--primary);
+  border: 1px solid var(--primary);
+  color: var(--background);
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+}
+
+.btn-primary-custom:hover {
+  background-color: var(--accent);
+  color: var(--primary-text);
+}
+
+.btn-outline-custom {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.6rem 1rem;
+}
+
+.btn-outline-custom:hover {
+  border-color: var(--primary);
+  color: var(--primary);
+}
+
+/* ====== Form layout ====== */
+.form-page {
+  display: grid;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.form-card {
+  width: 100%;
+  max-width: 720px;
+  padding: 1.25rem;
+}
+
+.form-title {
+  font-size: clamp(1.25rem, 1.1rem + 1vw, 1.75rem);
+  font-weight: 800;
+  margin: 0;
+}
+
+.form-subtitle {
+  color: var(--muted);
+  margin-top: 0.35rem;
+  margin-bottom: 1.25rem;
+}
+
+/* Dos columnas en desktop, una en mobile */
+.form-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+/* Para campos que ocupen todo el ancho (ej: descripción) */
+.form-span-2 {
+  grid-column: 1 / -1;
+}
+
+.form-label {
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+/* Inputs / textarea */
+.form-control,
+.form-select,
+textarea {
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 0.7rem 0.85rem;
+  outline: none;
+  box-shadow: none;
+}
+
+.form-control:focus,
+.form-select:focus,
+textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.25rem rgba(0, 212, 255, 0.22);
+}
+
+/* Footer del formulario */
+.form-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+/* Errores de Django */
+.field-error {
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+.help-text {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.form-label input {
+  border-radius: var(--border);
+}
+
+@media (min-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .form-card {
+    padding: 1.75rem;
+  }
+}
+
+@media (min-width: 576px) {
+  .form-actions {
+    flex-direction: row;
+    justify-content: flex-end;
+  }
 }
