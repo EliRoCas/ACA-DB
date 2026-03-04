@@ -48,7 +48,27 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### 4. Ejecutar migraciones
+### 4. Configurar variables de entorno
+```bash
+# Copiar el archivo de ejemplo
+cp .env.example .env
+
+# Windows: usar copy en lugar de cp
+# copy .env.example .env
+```
+
+**Luego editar el archivo `.env` y agregar tus valores:**
+```env
+SECRET_KEY=tu-nueva-secret-key-aqui
+DEBUG=True
+```
+
+Para generar una nueva SECRET_KEY:
+```bash
+python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+```
+
+### 5. Ejecutar migraciones
 ```bash
 python manage.py migrate
 ```
@@ -67,7 +87,84 @@ La aplicación estará disponible en: `http://127.0.0.1:8000/`
 
 ---
 
-## 📁 Estructura del Proyecto
+## � Configuración para Equipos de Desarrollo
+
+### Compartir el Proyecto de Forma Segura
+
+**Para el líder del proyecto:**
+1. El archivo `.env` **NUNCA** se debe commitear (ya está en `.gitignore`)
+2. Proporcionar a los compañeros el archivo `.env.example` como referencia
+
+**Para los compañeros que clonen el proyecto:**
+```bash
+# 1. Clonar el repositorio
+git clone <repository-url>
+cd ACA-DB
+
+# 2. Copiar el archivo de ejemplo
+cp .env.example .env
+
+# 3. Completar el .env con tus valores
+# Edita .env y reemplaza:
+# - SECRET_KEY: Genera una nueva ejecutando:
+#   python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+# - DEBUG: Mantén 'True' para desarrollo
+
+# 4. Seguir el resto de pasos de instalación
+```
+
+### Flujo de Trabajo en Equipo
+```
+1. Compañero clona repo → obtiene .env.example
+2. Copia .env.example → .env
+3. Llena sus propios valores secretos en .env
+4. Commit y push → .env NUNCA se incluye (protegido por .gitignore)
+5. Otros compañeros hacen lo mismo en sus máquinas
+```
+
+### Git Workflow Recomendado
+```bash
+# Actualizar tu rama con los últimos cambios
+git pull origin main
+
+# Crear rama para tu feature
+git checkout -b feature/nombre-feature
+
+# Hacer cambios y commitear
+git add .
+git commit -m "feat: descripción del cambio"
+
+# Push a tu rama
+git push origin feature/nombre-feature
+
+# Crear Pull Request en GitHub para revisión
+
+# Después de merge, actualizar main
+git checkout main
+git pull origin main
+
+# Eliminar rama local
+git branch -d feature/nombre-feature
+```
+
+### ⚠️ Verificar antes de commitear
+Asegúrate de que tu `.env` no está en staging:
+```bash
+# Ver archivos a commitear
+git status
+
+# Si .env aparece, eliminarlo del staging
+git rm --cached .env
+```
+
+### ⚠️ Reglas Importantes
+- ✅ **Commitear**: `.env.example`, `settings.py`, `.gitignore`
+- ❌ **NUNCA commitear**: `.env`, `db.sqlite3`
+- 🔒 Cada desarrollador tiene sus propios valores SECRET_KEY y DEBUG
+
+---
+
+## �📁 Estructura del Proyecto
 
 ```
 ACA-DB/
