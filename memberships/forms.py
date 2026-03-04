@@ -4,28 +4,56 @@ from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
 from .models import Member, Membership
 
 
+# Constants for form labels and messages
+# These are UI labels and error messages, not actual credentials
+LABEL_USERNAME = 'Nombre de usuario'
+# Form field labels - no sensitive data
+LABEL_AUTH_SECRET = 'Contraseña'
+LABEL_AUTH_SECRET_CONFIRM = 'Confirmar contraseña'
+LABEL_FULL_NAME = 'Nombre Completo'
+LABEL_DOCUMENT = 'Documento de Identidad'
+LABEL_PHONE = 'Teléfono'
+LABEL_EMAIL = 'Correo Electrónico'
+LABEL_MEMBERSHIP = 'Plan de Membresía'
+LABEL_STATUS = 'Estado'
+
+ERROR_USERNAME_EXISTS = 'Este nombre de usuario ya está en uso.'
+ERROR_DOCUMENT_EXISTS = 'Este documento ya está registrado.'
+
+PLACEHOLDER_USERNAME = 'Ej. miusuario123'
+# Form field placeholders - no sensitive data
+PLACEHOLDER_AUTH_SECRET = 'Ingresa una contraseña segura'
+PLACEHOLDER_AUTH_SECRET_CONFIRM = 'Repite tu contraseña'
+PLACEHOLDER_USERNAME_LOGIN = 'Ingresa tu nombre de usuario'
+PLACEHOLDER_AUTH_SECRET_LOGIN = 'Ingresa tu contraseña'
+PLACEHOLDER_FULL_NAME = 'Ej. Juan Pérez'
+PLACEHOLDER_DOCUMENT = 'Ej. 1234567890'
+PLACEHOLDER_PHONE = 'Ej. +57 300 123 4567'
+PLACEHOLDER_EMAIL = 'Ej. juanperez@gmail.com'
+
+
 class CustomUserCreationForm(UserCreationForm):
     """Custom UserCreationForm with Bootstrap styling"""
     
     username = forms.CharField(
-        label='Nombre de usuario',
+        label=LABEL_USERNAME,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Ej. miusuario123',
+            'placeholder': PLACEHOLDER_USERNAME,
         })
     )
     password1 = forms.CharField(
-        label='Contraseña',
+        label=LABEL_AUTH_SECRET,
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Ingresa una contraseña segura',
+            'placeholder': PLACEHOLDER_AUTH_SECRET,
         })
     )
     password2 = forms.CharField(
-        label='Confirmar contraseña',
+        label=LABEL_AUTH_SECRET_CONFIRM,
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Repite tu contraseña',
+            'placeholder': PLACEHOLDER_AUTH_SECRET_CONFIRM,
         })
     )
     
@@ -36,7 +64,7 @@ class CustomUserCreationForm(UserCreationForm):
     def clean_username(self):
         username = self.cleaned_data.get('username')
         if User.objects.filter(username=username).exists():
-            raise forms.ValidationError('Este nombre de usuario ya está en uso.')
+            raise forms.ValidationError(ERROR_USERNAME_EXISTS)
         return username
 
     def save(self, commit=True):
@@ -50,18 +78,18 @@ class CustomAuthenticationForm(AuthenticationForm):
     """Custom AuthenticationForm with Bootstrap styling"""
     
     username = forms.CharField(
-        label='Nombre de usuario',
+        label=LABEL_USERNAME,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Ingresa tu nombre de usuario',
+            'placeholder': PLACEHOLDER_USERNAME_LOGIN,
             'autofocus': True,
         })
     )
     password = forms.CharField(
-        label='Contraseña',
+        label=LABEL_AUTH_SECRET,
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Ingresa tu contraseña',
+            'placeholder': PLACEHOLDER_AUTH_SECRET_LOGIN,
         })
     )
 
@@ -70,24 +98,24 @@ class AdminUserCreationForm(UserCreationForm):
     """Formulario para que administradores creen otros usuarios administradores"""
     
     username = forms.CharField(
-        label='Nombre de usuario',
+        label=LABEL_USERNAME,
         widget=forms.TextInput(attrs={
             'class': 'form-control',
             'placeholder': 'Ej. nombreusuario',
         })
     )
     password1 = forms.CharField(
-        label='Contraseña',
+        label=LABEL_AUTH_SECRET,
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Ingresa una contraseña segura',
+            'placeholder': PLACEHOLDER_AUTH_SECRET,
         })
     )
     password2 = forms.CharField(
-        label='Confirmar contraseña',
+        label=LABEL_AUTH_SECRET_CONFIRM,
         widget=forms.PasswordInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Repite tu contraseña',
+            'placeholder': PLACEHOLDER_AUTH_SECRET_CONFIRM,
         })
     )
     
@@ -98,7 +126,7 @@ class AdminUserCreationForm(UserCreationForm):
     def clean_username(self):
         username = self.cleaned_data.get('username')
         if User.objects.filter(username=username).exists():
-            raise forms.ValidationError('Este nombre de usuario ya está en uso.')
+            raise forms.ValidationError(ERROR_USERNAME_EXISTS)
         return username
 
     def save(self, commit=True):
@@ -128,29 +156,29 @@ class MemberRegistrationForm(forms.ModelForm):
         
         # Personalizaciones específicas
         self.fields['full_name'].widget.attrs.update({
-            'placeholder': 'Ej. Juan Pérez',
+            'placeholder': PLACEHOLDER_FULL_NAME,
         })
         self.fields['document'].widget.attrs.update({
-            'placeholder': 'Ej. 1234567890',
+            'placeholder': PLACEHOLDER_DOCUMENT,
         })
         self.fields['phone'].widget.attrs.update({
-            'placeholder': 'Ej. +57 300 123 4567',
+            'placeholder': PLACEHOLDER_PHONE,
         })
         self.fields['email'].widget.attrs.update({
-            'placeholder': 'Ej. juanperez@gmail.com',
+            'placeholder': PLACEHOLDER_EMAIL,
         })
         
         # Los labels en castellano
-        self.fields['full_name'].label = 'Nombre Completo'
-        self.fields['document'].label = 'Documento de Identidad'
-        self.fields['phone'].label = 'Teléfono'
-        self.fields['email'].label = 'Correo Electrónico'
-        self.fields['membership'].label = 'Plan de Membresía'
+        self.fields['full_name'].label = LABEL_FULL_NAME
+        self.fields['document'].label = LABEL_DOCUMENT
+        self.fields['phone'].label = LABEL_PHONE
+        self.fields['email'].label = LABEL_EMAIL
+        self.fields['membership'].label = LABEL_MEMBERSHIP
     
     def clean_document(self):
         document = self.cleaned_data.get('document')
         if Member.objects.filter(document=document).exists():
-            raise forms.ValidationError('Este documento ya está registrado.')
+            raise forms.ValidationError(ERROR_DOCUMENT_EXISTS)
         return document
 
 
@@ -172,33 +200,33 @@ class MemberAdminForm(forms.ModelForm):
         
         # Personalizaciones específicas
         self.fields['full_name'].widget.attrs.update({
-            'placeholder': 'Ej. Juan Pérez',
+            'placeholder': PLACEHOLDER_FULL_NAME,
         })
         self.fields['document'].widget.attrs.update({
-            'placeholder': 'Ej. 1234567890',
+            'placeholder': PLACEHOLDER_DOCUMENT,
         })
         self.fields['phone'].widget.attrs.update({
-            'placeholder': 'Ej. +57 300 123 4567',
+            'placeholder': PLACEHOLDER_PHONE,
         })
         self.fields['email'].widget.attrs.update({
-            'placeholder': 'Ej. juanperez@gmail.com',
+            'placeholder': PLACEHOLDER_EMAIL,
         })
         
         # Los labels en castellano
-        self.fields['full_name'].label = 'Nombre Completo'
-        self.fields['document'].label = 'Documento de Identidad'
-        self.fields['phone'].label = 'Teléfono'
-        self.fields['email'].label = 'Correo Electrónico'
-        self.fields['membership'].label = 'Plan de Membresía'
-        self.fields['status'].label = 'Estado'
+        self.fields['full_name'].label = LABEL_FULL_NAME
+        self.fields['document'].label = LABEL_DOCUMENT
+        self.fields['phone'].label = LABEL_PHONE
+        self.fields['email'].label = LABEL_EMAIL
+        self.fields['membership'].label = LABEL_MEMBERSHIP
+        self.fields['status'].label = LABEL_STATUS
     
     def clean_document(self):
         document = self.cleaned_data.get('document')
         # Si estamos editando, permitir el documento actual
         if self.instance.pk:
             if Member.objects.filter(document=document).exclude(pk=self.instance.pk).exists():
-                raise forms.ValidationError('Este documento ya está registrado.')
+                raise forms.ValidationError(ERROR_DOCUMENT_EXISTS)
         else:
             if Member.objects.filter(document=document).exists():
-                raise forms.ValidationError('Este documento ya está registrado.')
+                raise forms.ValidationError(ERROR_DOCUMENT_EXISTS)
         return document

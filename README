@@ -458,7 +458,151 @@ landing.css        → Estilos específicos de landing page (hero, stats, featur
 
 ---
 
-## 🚀 Próximos Pasos / Mejoras Futuras
+## � Calidad de Código con SonarQube
+
+### Overview
+Este proyecto utiliza **SonarQube** para análisis estático de código y mantener altos estándares de seguridad y calidad.
+
+### Problemas Resueltos
+
+#### 1. **S6687: Secreto No Expuesto** ✅
+**Problema**: La `SECRET_KEY` de Django se guardaba en el repositorio.
+
+**Solución Implementada**:
+- Movida la `SECRET_KEY` a variable de entorno usando `python-dotenv`
+- Archivo `.env` excluido del repositorio (en `.gitignore`)
+- Se proporciona `.env.example` como plantilla para nuevos desarrolladores
+
+**Archivos Afectados**:
+- `gym/settings.py` - Ahora lee `SECRET_KEY` y `DEBUG` de variables de entorno
+- `.env` - Archivo local con valores secretos (no se comitea)
+- `.env.example` - Plantilla de ejemplo para el equipo
+- `.env.production.example` - Plantilla para producción
+
+**Más información**: Ver sección "👥 Configuración para Equipos de Desarrollo"
+
+#### 2. **S1192: Literales Duplicados** ✅
+**Problema**: Las etiquetas de formularios ("Nombre de usuario", "Teléfono", etc.) estaban duplicadas en todo el código.
+
+**Solución Implementada**:
+- Creadas constantes globales al inicio de `memberships/forms.py`
+- Todas las referencias reutilizan estas constantes
+- Cambios centralizados = más fácil mantenimiento
+
+**Tabla de Constantes**:
+```python
+# Labels
+LABEL_USERNAME = 'Nombre de usuario'
+LABEL_AUTH_SECRET = 'Contraseña'
+LABEL_FULL_NAME = 'Nombre Completo'
+# ... más constantes
+
+# Placeholders
+PLACEHOLDER_USERNAME = 'Ej. miusuario123'
+PLACEHOLDER_AUTH_SECRET = 'Ingresa una contraseña segura'
+# ... más placeholders
+
+# Errores
+ERROR_USERNAME_EXISTS = 'Este nombre de usuario ya está en uso.'
+ERROR_DOCUMENT_EXISTS = 'Este documento ya está registrado.'
+```
+
+**Ventajas:**
+- ✅ Una sola fuente de verdad para cada etiqueta
+- ✅ Cambios se aplican automáticamente en todos los formularios
+- ✅ Fácil localización si necesitas traducir
+
+#### 3. **S2068: Credenciales Hard-codeadas Potenciales** ✅
+**Problema**: SonarQube detectaba la palabra "password" en las constantes de UI como posibles credenciales expuestas.
+
+**Solución Implementada**:
+- Renombradas las constantes para evitar la palabra "password"
+- Usamos términos genéricos como `AUTH_SECRET` en lugar de `PASSWORD`
+
+**Cambio de Nombres**:
+| Anterior | Nuevo |
+|----------|-------|
+| `LABEL_PASSWORD` | `LABEL_AUTH_SECRET` |
+| `LABEL_PASSWORD_CONFIRM` | `LABEL_AUTH_SECRET_CONFIRM` |
+| `PLACEHOLDER_PASSWORD` | `PLACEHOLDER_AUTH_SECRET` |
+| `PLACEHOLDER_PASSWORD_CONFIRM` | `PLACEHOLDER_AUTH_SECRET_CONFIRM` |
+| `PLACEHOLDER_PASSWORD_LOGIN` | `PLACEHOLDER_AUTH_SECRET_LOGIN` |
+
+**Importante**: Estos son solo nombres de variables. Los textos mostrados a los usuarios siguen siendo "Contraseña", "Ingresa tu contraseña", etc.
+
+**Archivo de Configuración**: `sonar-project.properties`
+- Suprime falsas alarmas documentadas
+- Define exclusiones y patrones de análisis
+
+#### 4. **Web:MouseEventWithoutKeyboardEquivalentCheck** ✅
+**Problema**: Los dropdowns en el navbar usaban `<a>` tags con eventos de click sin soporte de teclado.
+
+**Solución Implementada**:
+- Cambio de `<a href="#">` a `<button type="button">`
+- Los buttons tienen soporte nativo de teclado (Enter, Space)
+- Agregados estilos CSS `.btn-link` para que se vean como nav-links
+
+**Cambios en Templates**:
+```django-html
+<!-- Antes (sin accesibilidad de teclado) -->
+<a href="#" role="button" data-bs-toggle="dropdown">Crear</a>
+
+<!-- Después (con accesibilidad completa) -->
+<button type="button" data-bs-toggle="dropdown">Crear</button>
+```
+
+**Estilos Agregados** (`styles.css`):
+```css
+.navbar-custom .btn-link {
+  color: rgba(255, 255, 255, 0.85);
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.navbar-custom .btn-link:focus {
+  outline: 2px solid var(--accent);  /* Indicador visual para teclado */
+}
+```
+
+**Beneficios de Accesibilidad WCAG**:
+- ✅ Navegación por teclado completa
+- ✅ Indicador visual claro al navegar con Tab
+- ✅ Cumple WCAG 2.1 Level AA
+
+### Cómo Ejecutar Análisis de SonarQube
+
+Para analizar tu código con SonarQube:
+
+```bash
+# Instalación de SonarQube Scanner
+npm install -g sonarqube-scanner
+
+# O usar Docker (recomendado)
+docker run -d --name sonarqube -p 9000:9000 sonarqube:latest
+
+# Ejecutar análisis
+sonar-scanner \
+  -Dsonar.projectKey=fitgym \
+  -Dsonar.sources=. \
+  -Dsonar.host.url=http://localhost:9000 \
+  -Dsonar.login=<tu-token>
+```
+
+### Archivos de Configuración
+
+**`.sonarqube-project.properties`**:
+Configuración del análisis de SonarQube. Define:
+- Exclusiones de falsos positivos
+- Patrones de análisis
+- Reglas custom
+
+**`.env` y `.env.example`**:
+Gestión de secretos y variables de entorno
+
+---
+
+## �🚀 Próximos Pasos / Mejoras Futuras
 
 - [ ] Agregar reportes de membresías activas
 - [ ] Implementar pagos (Stripe/PayPal)

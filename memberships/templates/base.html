@@ -97,14 +97,13 @@
               {% endif %}
               {% if user.is_authenticated %}
               <li class="nav-item dropdown">
-                <a
-                  class="nav-link dropdown-toggle"
-                  href="#"
+                <button
+                  class="nav-link dropdown-toggle btn btn-link"
+                  type="button"
                   id="createDropdown"
-                  role="button"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
-                  >➕ Crear</a
+                  >➕ Crear</button
                 >
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="createDropdown">
                   <li>
@@ -119,14 +118,13 @@
                 </ul>
               </li>
               <li class="nav-item dropdown">
-                <a
-                  class="nav-link dropdown-toggle"
-                  href="#"
+                <button
+                  class="nav-link dropdown-toggle btn btn-link"
+                  type="button"
                   id="userDropdown"
-                  role="button"
                   data-bs-toggle="dropdown"
                   aria-expanded="false"
-                  >👤 {{ user.username }}</a
+                  >👤 {{ user.username }}</button
                 >
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
                   <li>
