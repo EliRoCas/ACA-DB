@@ -3,7 +3,7 @@
 <html lang="es">
   <head>
     <meta charset="UTF-8" />
-    <title>{% block title %}Gym Management{% endblock %}</title>
+    <title>{% block title %}FitGym - Centro de Fitness{% endblock %}</title>
     <meta
       name="viewport"
       content="width=device-width, initial-scale=1"
@@ -28,53 +28,130 @@
     <div class="layout">
       <!-- NAVBAR -->
       <nav class="navbar navbar-expand-lg navbar-custom">
-        <div class="container">
+        <div class="container-fluid px-4">
           <a
             class="navbar-brand fw-bold"
             href="/"
-            >🏋 Gym Admin</a
+            >🏋️ FitGym</a
           >
 
-          <div>
+          <button
+            class="navbar-toggler border-0"
+            type="button"
+            data-bs-toggle="collapse"
+            data-bs-target="#navbarNav"
+            aria-controls="navbarNav"
+            aria-expanded="false"
+            aria-label="Toggle navigation"
+          >
+            <span class="navbar-toggler-icon"></span>
+          </button>
+
+          <div class="collapse navbar-collapse" id="navbarNav">
             <ul class="navbar-nav ms-auto">
               <li class="nav-item">
                 <a
                   class="nav-link"
-                  href="/memberships/"
-                  >Planes</a
+                  href="/"
+                  >Inicio</a
                 >
               </li>
+              {% if not user.is_authenticated %}
               <li class="nav-item">
                 <a
                   class="nav-link"
-                  href="#"
+                  href="/#planes"
+                  >Planes</a
+                >
+              </li>
+              {% else %}
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="{% url 'member_list' %}"
                   >Miembros</a
                 >
               </li>
               <li class="nav-item">
                 <a
                   class="nav-link"
-                  href="#"
-                  >Pagos</a
+                  href="{% url 'membership_list' %}"
+                  >Membresías</a
                 >
               </li>
               <li class="nav-item">
                 <a
                   class="nav-link"
-                  href="#"
-                  >Reportes</a
+                  href="{% url 'admin_user_list' %}"
+                  >Usuarios Admin</a
                 >
               </li>
+              {% endif %}
+              {% if user.is_authenticated %}
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  id="createDropdown"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >➕ Crear</a
+                >
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="createDropdown">
+                  <li>
+                    <a class="dropdown-item" href="{% url 'membership_create' %}">+ Crear Plan de Membresía</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'member_create' %}">+ Agregar Miembro</a>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{% url 'admin_user_create' %}">+ Crear Usuario Admin</a>
+                  </li>
+                </ul>
+              </li>
+              <li class="nav-item dropdown">
+                <a
+                  class="nav-link dropdown-toggle"
+                  href="#"
+                  id="userDropdown"
+                  role="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                  >👤 {{ user.username }}</a
+                >
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="userDropdown">
+                  <li>
+                    <h6 class="dropdown-header">{{ user.get_full_name|default:user.username }}</h6>
+                  </li>
+                  <li><hr class="dropdown-divider" /></li>
+                  <li>
+                    <form method="post" action="{% url 'logout' %}" style="display: inline;">
+                      {% csrf_token %}
+                      <button type="submit" class="dropdown-item" style="background: none; border: none; cursor: pointer; padding: 0.5rem 1rem; text-align: left; width: 100%;">Cerrar sesión</button>
+                    </form>
+                  </li>
+                </ul>
+              </li>
+              {% else %}
+              <li class="nav-item ms-lg-2 mt-2 mt-lg-0">
+                <a
+                  class="nav-link nav-create-btn"
+                  href="{% url 'login' %}"
+                  >Iniciar Sesión</a
+                >
+              </li>
+              {% endif %}
             </ul>
           </div>
         </div>
       </nav>
 
       <!-- CONTENIDO -->
-      <main class="content container mt-5">{% block content %} {% endblock %}</main>
+      <main class="content">{% block content %} {% endblock %}</main>
 
       <!-- FOOTER -->
-      <footer class="footer">© {{ now|date:"Y" }} Gym Management System</footer>
+      <footer class="footer">© {{ now|date:"Y" }} FitGym - Todos los derechos reservados</footer>
     </div>
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>

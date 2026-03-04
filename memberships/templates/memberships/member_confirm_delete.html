@@ -1,0 +1,30 @@
+{% extends "base.html" %} {% block title %}Eliminar Miembro{% endblock %} {% block content %}
+<section class="membership-container form-page">
+  <div class="card card-custom form-card">
+    <header class="mb-4">
+      <h1 class="form-title">Eliminar Miembro</h1>
+      <p class="form-subtitle">¿Estás seguro de que deseas eliminar este miembro?</p>
+    </header>
+
+    <div class="alert alert-warning" role="alert">
+      <strong>Advertencia:</strong> Esta acción no se puede deshacer. Se eliminará el registro de <strong>{{ object.full_name }}</strong> de la base de datos.
+    </div>
+
+    <div class="card p-3 mb-4">
+      <h5>{{ object.full_name }}</h5>
+      <p class="mb-2"><strong>Documento:</strong> {{ object.document }}</p>
+      {% if object.email %}<p class="mb-2"><strong>Email:</strong> {{ object.email }}</p>{% endif %}
+      {% if object.phone %}<p class="mb-2"><strong>Teléfono:</strong> {{ object.phone }}</p>{% endif %}
+      {% if object.membership %}<p class="mb-0"><strong>Plan:</strong> {{ object.membership.name }}</p>{% endif %}
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-actions mt-4">
+        <a class="btn btn-outline-custom" href="{% url 'member_list' %}">Cancelar</a>
+        <button class="btn btn-danger-custom" type="submit">Eliminar Miembro</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

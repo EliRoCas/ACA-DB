@@ -1,0 +1,26 @@
+{% extends "base.html" %} {% block title %}Registro Exitoso{% endblock %} {% block content %}
+<section class="membership-container form-page">
+  <div class="card card-custom form-card">
+    <div style="text-align: center;">
+      <div style="font-size: 4rem; margin-bottom: 20px;">✅</div>
+      <h1 class="form-title">¡Registro Exitoso!</h1>
+      <p class="form-subtitle" style="margin-bottom: 30px;">
+        Tu solicitud de membresía ha sido recibida correctamente.
+      </p>
+
+      <div class="alert alert-info" role="alert" style="text-align: left;">
+        <h5>¿Qué sucede ahora?</h5>
+        <ul style="margin-bottom: 0; padding-left: 20px;">
+          <li>Nuestro equipo revisará tu solicitud en las próximas 24 horas.</li>
+          <li>Te enviaremos un correo de confirmación a <strong>{{ form.email.value }}</strong></li>
+          <li>Una vez aprobado, podrás acceder a todas las instalaciones de FitGym.</li>
+        </ul>
+      </div>
+
+      <div style="margin-top: 30px;">
+        <a href="{% url 'landing' %}" class="btn btn-primary-custom">Volver al Inicio</a>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

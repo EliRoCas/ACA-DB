@@ -1,55 +1,62 @@
-{% extends "base.html" %} {% load humanize %} {% block title %}Planes{% endblock %} {% block content %}
-<div class="d-flex align-items-center justify-content-between mb-4">
-  <h1 class="m-0">Planes de Membresía</h1>
-  <a
-    class="btn btn-primary-custom"
-    href="{% url 'membership_create' %}"
-  >
-    + Crear plan
-  </a>
-</div>
+{% extends "base.html" %}
+{% load humanize currency_filters %}
 
-{% if memberships %}
-<div class="row g-3">
-  {% for m in memberships %}
-  <div class="col-12 col-md-6 col-lg-4">
-    <article class="card card-custom h-100 p-3">
-      <header class="d-flex align-items-start justify-content-between gap-2">
-        <h2 class="h5 m-0">{{ m.name }}</h2>
-        <span
-          class="badge text-bg-light border"
-          style="border-color: var(--border) !important"
-        >
-          {{ m.duration_months }} mes{{ m.duration_months|pluralize:"es" }}
-        </span>
-      </header>
+{% block title %}Planes{% endblock %}
 
-      <p class="mt-2 mb-3 text-muted">
-        {{ m.description|default:"Sin descripción."|truncatechars:120 }}
-      </p>
+{% block content %}
+<style>
+  .membership-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 40px 20px;
+  }
+</style>
 
-      <div class="mt-auto d-flex align-items-center justify-content-between">
-        <strong class="fs-5"> ${{ m.price|floatformat:2|intcomma }} </strong>
-
-        <div class="d-flex gap-2">
-          <a
-            class="btn btn-outline-secondary btn-sm"
-            href="#"
-            >Editar</a
-          >
-          <a
-            class="btn btn-outline-danger btn-sm"
-            href="#"
-            >Eliminar</a
-          >
-        </div>
-      </div>
-    </article>
+<div class="membership-container">
+  <div class="d-flex align-items-center justify-content-between mb-4">
+    <h1 class="m-0">Planes de Membresía</h1>
+    {% if user.is_authenticated %}
+    <a class="btn btn-primary-custom" href="{% url 'membership_create' %}">
+      + Crear plan
+    </a>
+    {% endif %}
   </div>
-  {% endfor %}
+
+  {% if memberships %}
+  <div class="row g-3">
+    {% for m in memberships %}
+    <div class="col-12 col-md-6 col-lg-4">
+      <article class="card card-custom h-100 p-3">
+        <header class="d-flex align-items-start justify-content-between gap-2">
+          <h2 class="h5 m-0">{{ m.name }}</h2>
+          <span class="badge text-bg-light border" style="border-color: var(--border) !important">
+            {{ m.duration_months }} mes{{ m.duration_months|pluralize:"es" }}
+          </span>
+        </header>
+
+        <p class="mt-2 mb-3 text-muted">
+          {{ m.description|default:"Sin descripción."|truncatechars:120 }}
+        </p>
+
+        <div class="mt-auto d-flex align-items-center justify-content-between">
+          <strong class="fs-5">{{ m.price|cop_currency }}</strong>
+
+          {% if user.is_authenticated %}
+          <div class="d-flex gap-2">
+            <a class="btn btn-outline-secondary btn-sm" href="{% url 'membership_edit' m.pk %}">Editar</a>
+            <a class="btn btn-outline-danger btn-sm" href="{% url 'membership_delete' m.pk %}">Eliminar</a>
+          </div>
+          {% endif %}
+        </div>
+      </article>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="alert alert-info" role="alert">
+    No hay planes disponibles.
+    <a href="{% url 'membership_create' %}" class="alert-link">Crear el primero</a>
+  </div>
+  {% endif %}
 </div>
-{% else %}
-<div class="card card-custom p-4">
-  <p class="m-0">Aún no hay planes creados.</p>
-</div>
-{% endif %} {% endblock %}
+{% endblock %}

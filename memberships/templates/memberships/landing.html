@@ -1,0 +1,496 @@
+{% extends "base.html" %}
+{% load currency_filters %}
+
+{% block title %}FitGym - Tu Espacio de Transformación{% endblock %}
+
+{% block extra_css %}
+<style>
+  /* Landing Page Custom Styles */
+  .landing-layout {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+
+  /* HERO SECTION */
+  .hero-section {
+    background: linear-gradient(135deg, var(--primary) 0%, rgba(0, 86, 179, 0.8) 100%);
+    color: white;
+    padding: 80px 20px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 400px;
+    height: 400px;
+    background: rgba(0, 212, 255, 0.1);
+    border-radius: 50%;
+    z-index: 0;
+  }
+
+  .hero-content {
+    position: relative;
+    z-index: 1;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  .hero-section h1 {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+    animation: slideInDown 0.8s ease-out;
+  }
+
+  .hero-section p {
+    font-size: 1.3rem;
+    margin-bottom: 30px;
+    animation: slideInUp 0.8s ease-out 0.2s both;
+    line-height: 1.6;
+  }
+
+  .cta-buttons {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: wrap;
+    animation: slideInUp 0.8s ease-out 0.4s both;
+  }
+
+  .btn-primary-landing {
+    background-color: var(--accent);
+    color: var(--primary);
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-primary-landing:hover {
+    background-color: white;
+    transform: translateY(-3px);
+    box-shadow: 0 15px 40px rgba(0, 212, 255, 0.3);
+  }
+
+  .btn-secondary-landing {
+    background-color: transparent;
+    color: white;
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: 700;
+    border: 2px solid white;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .btn-secondary-landing:hover {
+    background-color: white;
+    color: var(--primary);
+  }
+
+  /* STATS SECTION */
+  .stats-section {
+    background-color: var(--background);
+    padding: 60px 20px;
+    text-align: center;
+  }
+
+  .stats-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .stat-card {
+    padding: 30px 20px;
+  }
+
+  .stat-number {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 10px;
+  }
+
+  .stat-label {
+    font-size: 1.1rem;
+    color: var(--muted);
+  }
+
+  /* FEATURES SECTION */
+  .features-section {
+    background-color: var(--border);
+    padding: 80px 20px;
+  }
+
+  .section-title {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--primary);
+    text-align: center;
+    margin-bottom: 60px;
+  }
+
+  .features-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .feature-card {
+    background-color: white;
+    padding: 40px 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    transition: all 0.3s ease;
+  }
+
+  .feature-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 86, 179, 0.15);
+  }
+
+  .feature-icon {
+    font-size: 3rem;
+    margin-bottom: 20px;
+  }
+
+  .feature-card h3 {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin-bottom: 15px;
+  }
+
+  .feature-card p {
+    color: var(--muted);
+    line-height: 1.6;
+  }
+
+  /* MEMBERSHIP PLANS SECTION */
+  .plans-section {
+    background-color: white;
+    padding: 80px 20px;
+  }
+
+  .plans-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .plan-card {
+    background: linear-gradient(135deg, var(--background), var(--border));
+    border: 2px solid var(--border);
+    border-radius: 15px;
+    padding: 40px 30px;
+    text-align: center;
+    transition: all 0.3s ease;
+    position: relative;
+  }
+
+  .plan-card.featured {
+    border-color: var(--accent);
+    transform: scale(1.05);
+    box-shadow: 0 10px 40px rgba(0, 212, 255, 0.2);
+  }
+
+  .plan-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 15px 40px rgba(0, 86, 179, 0.1);
+  }
+
+  .badge-popular {
+    position: absolute;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%);
+    background-color: var(--accent);
+    color: var(--primary);
+    padding: 8px 20px;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+
+  .plan-name {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--primary);
+    margin: 10px 0;
+  }
+
+  .plan-price {
+    font-size: 2.5rem;
+    font-weight: 800;
+    color: var(--accent);
+    margin: 20px 0;
+  }
+
+  .plan-price small {
+    font-size: 0.9rem;
+    color: var(--muted);
+  }
+
+  .plan-duration {
+    color: var(--muted);
+    margin-bottom: 20px;
+    font-size: 1rem;
+  }
+
+  .plan-description {
+    color: var(--muted);
+    margin: 20px 0;
+    line-height: 1.6;
+    min-height: 60px;
+  }
+
+  .btn-plan {
+    background-color: var(--primary);
+    color: white;
+    padding: 12px 30px;
+    border: none;
+    border-radius: 50px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+    margin-top: 20px;
+  }
+
+  .btn-plan:hover {
+    background-color: var(--accent);
+    color: var(--primary);
+    transform: translateY(-3px);
+  }
+
+  /* CTA SECTION */
+  .cta-section {
+    background: linear-gradient(135deg, var(--primary) 0%, rgba(0, 86, 179, 0.85) 100%);
+    color: white;
+    padding: 60px 20px;
+    text-align: center;
+  }
+
+  .cta-section h2 {
+    font-size: 2.5rem;
+    font-weight: 800;
+    margin-bottom: 20px;
+  }
+
+  .cta-section p {
+    font-size: 1.2rem;
+    margin-bottom: 30px;
+    opacity: 0.95;
+  }
+
+  /* FOOTER personalizado */
+  footer {
+    background-color: var(--primary);
+    color: white;
+    padding: 30px 20px;
+    text-align: center;
+  }
+
+  /* ANIMATIONS */
+  @keyframes slideInDown {
+    from {
+      opacity: 0;
+      transform: translateY(-30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  @keyframes slideInUp {
+    from {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 768px) {
+    .hero-section h1 {
+      font-size: 2.5rem;
+    }
+
+    .hero-section p {
+      font-size: 1.1rem;
+    }
+
+    .cta-buttons {
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .btn-primary-landing,
+    .btn-secondary-landing {
+      width: 100%;
+      max-width: 300px;
+    }
+
+    .section-title {
+      font-size: 2rem;
+    }
+
+    .plan-card.featured {
+      transform: scale(1);
+    }
+
+    .hero-section::before {
+      width: 250px;
+      height: 250px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .hero-section {
+      padding: 50px 15px;
+    }
+
+    .hero-section h1 {
+      font-size: 2rem;
+    }
+
+    .stats-container {
+      gap: 20px;
+    }
+
+    .features-container,
+    .plans-container {
+      gap: 20px;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="landing-layout">
+  <!-- HERO SECTION -->
+  <section class="hero-section">
+    <div class="hero-content">
+      <h1>🏋️ FitGym</h1>
+      <p>Transforma tu cuerpo, transforma tu vida. Únete a nuestra comunidad de fitness hoy mismo.</p>
+      <div class="cta-buttons">
+        <a href="#planes" class="btn-primary-landing">Ver Planes</a>
+        <a href="#contacto" class="btn-secondary-landing">Contáctanos</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS SECTION -->
+  <section class="stats-section">
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-number">{{ member_count }}+</div>
+        <div class="stat-label">Miembros Activos</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">{{ memberships.count }}</div>
+        <div class="stat-label">Planes Disponibles</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-number">10+</div>
+        <div class="stat-label">Años de Experiencia</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES SECTION -->
+  <section class="features-section">
+    <h2 class="section-title">¿Por Qué Elegirnos?</h2>
+    <div class="features-container">
+      <div class="feature-card">
+        <div class="feature-icon">💪</div>
+        <h3>Equipamiento Moderno</h3>
+        <p>Nuestro gimnasio cuenta con la última tecnología en equipamiento de fitness para todos los niveles.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">👥</div>
+        <h3>Entrenadores Certificados</h3>
+        <p>Profesionales especializados listos para guiarte en tu camino hacia tus objetivos fitness.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📅</div>
+        <h3>Horarios Flexibles</h3>
+        <p>Acceso 24/7 para que entrenes cuando mejor se adapte a tu rutina diaria.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🎯</div>
+        <h3>Planes Personalizados</h3>
+        <p>Diseñamos programas adaptados a tus necesidades y objetivos específicos.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🏆</div>
+        <h3>Resultados Garantizados</h3>
+        <p>Nuestros miembros experimentan transformaciones reales en corto plazo.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🤝</div>
+        <h3>Comunidad Supportiva</h3>
+        <p>Únete a una comunidad que se motiva mutuamente para alcanzar objetivos.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- MEMBERSHIP PLANS SECTION -->
+  <section class="plans-section" id="planes">
+    <h2 class="section-title">Nuestros Planes</h2>
+    <div class="plans-container">
+      {% for membership in memberships %}
+      <div class="plan-card {% if forloop.counter == 2 %}featured{% endif %}">
+        {% if forloop.counter == 2 %}<div class="badge-popular">Más Popular</div>{% endif %}
+        <h3 class="plan-name">{{ membership.name }}</h3>
+        <div class="plan-price">
+          {{ membership.price|cop_currency }}<small>/mes</small>
+        </div>
+        <p class="plan-duration">{{ membership.duration_months }} meses</p>
+        <p class="plan-description">{% if membership.description %}{{ membership.description }}{% else %}Plan perfecto para tu objetivo.{% endif %}</p>
+        <a href="{% url 'member_register' %}" class="btn-plan">Unirse Ahora</a>
+      </div>
+      {% empty %}
+      <p style="grid-column: 1/-1; text-align: center; color: var(--muted);">
+        Próximamente estarán disponibles nuestros planes. ¡Regresa pronto!
+      </p>
+      {% endfor %}
+    </div>
+  </section>
+
+  <!-- CTA SECTION -->
+  <section class="cta-section" id="contacto">
+    <h2>¿Listo para Comenzar tu Transformación?</h2>
+    <p>Únete a cientos de miembros satisfechos que ya están logrando sus objetivos.</p>
+    <a href="{% url 'member_register' %}" class="btn-primary-landing" style="margin-top: 20px;">Explorar Membresías</a>
+  </section>
+</div>
+{% endblock %}

@@ -1,5 +1,5 @@
 {% extends "base.html" %} {% block title %}Crear Plan{% endblock %} {% block content %}
-<section class="form-page">
+<section class="membership-container form-page">
   <div class="card card-custom form-card">
     <header class="mb-3">
       <h1 class="form-title">Nuevo Plan</h1>
@@ -58,7 +58,7 @@
         </div>
       </div>
 
-      <div class="form-actions">
+      <div class="form-actions mt-4">
         <a
           class="btn btn-outline-custom"
           href="{% url 'membership_list' %}"

@@ -24,6 +24,7 @@ body,
   height: 100%;
   width: 100%;
   overflow: hidden;
+  scroll-behavior: smooth;
 }
 
 body {
@@ -48,6 +49,13 @@ body {
   overflow-y: auto;
   width: 100%;
   margin: 0 !important;
+  padding: 0;
+}
+
+.membership-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
 }
 
 .footer {
@@ -56,24 +64,68 @@ body {
 
 .navbar-custom {
   background-color: var(--primary);
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 1rem 0;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
 }
 
-.navbar-custom .navbar-brand,
-.navbar-custom .nav-link {
-  color: var(--background);
+.navbar-custom .navbar-brand {
+  color: white;
+  font-size: 1.5rem;
+  font-weight: 800;
+  text-decoration: none;
+  transition: 0.3s ease;
 }
 
-.navbar-custom .nav-link:hover {
+.navbar-custom .navbar-brand:hover {
   color: var(--accent);
 }
 
+.navbar-custom .nav-link {
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  margin-left: 10px;
+}
+
+.navbar-custom .nav-link:hover,
+.navbar-custom .nav-link.active {
+  color: var(--accent) !important;
+}
+
+.navbar-custom .nav-create-btn {
+  color: var(--primary) !important;
+  background-color: var(--accent);
+  border-radius: 999px;
+  padding: 0.4rem 0.9rem;
+  font-weight: 700;
+}
+
+.navbar-custom .nav-create-btn:hover {
+  background-color: #ffffff;
+  color: var(--primary) !important;
+}
+
+.navbar-toggler {
+  border: none;
+  outline: none;
+}
+
+.navbar-toggler-icon {
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba%28255, 255, 255, 0.85%29' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
 footer {
-  margin-top: 50px;
-  padding: 20px 0;
-  border-top: 1px solid var(--border);
+  margin-top: 0;
+  padding: 30px 20px;
+  background-color: var(--primary);
+  color: white;
+  border-top: none;
   text-align: center;
   font-size: 14px;
-  color: var(--primary-text);
+  font-weight: 500;
 }
 
 /* ====== Card base ====== */
@@ -175,6 +227,34 @@ textarea {
 textarea:focus {
   border-color: var(--accent);
   box-shadow: 0 0 0 0.25rem rgba(0, 212, 255, 0.22);
+}
+
+.form-control.is-invalid,
+.form-select.is-invalid,
+textarea.is-invalid {
+  border-color: var(--danger);
+  background-color: #fff6f6;
+}
+
+.form-control.is-invalid:focus,
+.form-select.is-invalid:focus,
+textarea.is-invalid:focus {
+  border-color: var(--danger);
+  box-shadow: 0 0 0 0.2rem rgba(180, 35, 24, 0.2);
+}
+
+.form-control.is-valid,
+.form-select.is-valid,
+textarea.is-valid {
+  border-color: #0f9d58;
+  background-color: #f4fff8;
+}
+
+.form-control.is-valid:focus,
+.form-select.is-valid:focus,
+textarea.is-valid:focus {
+  border-color: #0f9d58;
+  box-shadow: 0 0 0 0.2rem rgba(15, 157, 88, 0.2);
 }
 
 /* Footer del formulario */

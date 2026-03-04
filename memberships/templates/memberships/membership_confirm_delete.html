@@ -1,0 +1,39 @@
+{% extends "base.html" %} {% load currency_filters %} {% block title %}Eliminar Plan{% endblock %} {% block content %}
+<section class="membership-container form-page">
+  <div class="card card-custom form-card">
+    <header class="mb-4">
+      <h1 class="form-title">Eliminar Plan</h1>
+      <p class="form-subtitle">¿Estás seguro de que deseas eliminar este plan?</p>
+    </header>
+
+    <div class="alert alert-warning" role="alert">
+      <strong>Advertencia:</strong> Esta acción no se puede deshacer. Se eliminará el plan
+      <strong>{{ object.name }}</strong> de la base de datos.
+    </div>
+
+    <div class="card p-3 mb-4">
+      <h5>{{ object.name }}</h5>
+      <p class="text-muted mb-0">{{ object.description }}</p>
+      <p class="mt-2"><strong>Precio:</strong> {{ object.price|cop_currency }}/mes</p>
+      <p><strong>Duración:</strong> {{ object.duration_months }} mes{{ object.duration_months|pluralize:"es" }}</p>
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-actions mt-4">
+        <a
+          class="btn btn-outline-custom"
+          href="{% url 'membership_list' %}"
+          >Cancelar</a
+        >
+        <button
+          class="btn btn-danger-custom"
+          type="submit"
+        >
+          Eliminar
+        </button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}
