@@ -1,23 +1,390 @@
-Azul Cobalto (#0056B3) - El Color de Acción:
+# FitGym - Sistema de Gestión de Membresías de Gimnasio
 
-Uso: Úsalo exclusivamente para el botón principal de "Registrarse" o "Comenzar Entrenamiento".
+## 📋 Descripción del Proyecto
 
-Por qué: Es un color fuerte que resalta sobre fondos claros, indicando "haz clic aquí". También úsalo en los títulos principales (H1) para dar autoridad.
+FitGym es una aplicación web de Django para la gestión integral de un gimnasio. Proporciona dos interfaces diferenciadas:
 
-Cian Eléctrico (#00D4FF) - Guía Visual:
+- **Landing Page Pública**: Página de inicio con información del gimnasio y planes de membresía disponibles
+- **Panel Administrativo Protegido**: Sistema de gestión de membresías, miembros y usuarios administradores con autenticación requerida
 
-Uso: Úsalo en el estado "hover" (cuando pasas el mouse por encima del botón) o en elementos de progreso, como barras de pasos (ej: "Paso 1 de 3").
+## 🛠️ Tech Stack
 
-Por qué: Es un color energético que ayuda a que el usuario sepa qué está seleccionando sin ser tan agresivo como el rojo o el naranja.
+- **Backend**: Django 6.0.2
+- **Base de Datos**: SQLite3 (desarrollo)
+- **Fronted**: HTML5, CSS3, Bootstrap 5.3.3
+- **Python**: 3.14.3
+- **Autenticación**: Django Auth (built-in)
+- **Template Engine**: Django Templates
 
-Blanco Níveo (#FFFFFF) - Fondo:
+## 📦 Requisitos
 
-Uso: Este es el fondo de toda la página.
+```
+Django==6.0.2
+python-dateutil==2.8.2
+django-humanize==0.1.2
+```
 
-Por qué: Mantiene la sensación de "gimnasio limpio" y salud.
+## ⚙️ Instalación y Setup
 
-Gris Claro (#E9ECEF) - Estructura:
+### 1. Clonar el repositorio
+```bash
+git clone <repository-url>
+cd ACA-DB
+```
 
-Uso: Úsalo en los bordes de los campos de texto (input fields) y líneas divisorias sutiles.
+### 2. Crear y activar el entorno virtual
+```bash
+# Windows
+python -m venv venv
+.\venv\Scripts\Activate.ps1
 
-Por qué: Delimita el espacio de registro sin saturar la vista con líneas negras pesadas.
+# Linux/Mac
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 3. Instalar dependencias
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Ejecutar migraciones
+```bash
+python manage.py migrate
+```
+
+### 5. Crear superusuario (administrador)
+```bash
+python manage.py createsuperuser
+```
+
+### 6. Ejecutar servidor de desarrollo
+```bash
+python manage.py runserver
+```
+
+La aplicación estará disponible en: `http://127.0.0.1:8000/`
+
+---
+
+## 📁 Estructura del Proyecto
+
+```
+ACA-DB/
+│
+├── manage.py                    # Utilidad de línea de comandos
+├── db.sqlite3                   # Base de datos
+├── README                       # Este archivo
+│
+├── gym/                         # Configuración principal del proyecto
+│   ├── settings.py             # Configuración de Django
+│   ├── urls.py                 # URLs raíz del proyecto
+│   ├── asgi.py                 # ASGI config
+│   ├── wsgi.py                 # WSGI config
+│   └── __init__.py
+│
+├── memberships/                 # Aplicación principal (gestión de membresías)
+│   ├── models.py               # Modelos: Membership, Member
+│   ├── views.py                # Vistas (15+ CBVs para CRUD)
+│   ├── forms.py                # Formularios personalizados
+│   ├── urls.py                 # URLs de memberships
+│   ├── admin.py                # Configuración de admin de Django
+│   ├── apps.py                 # Configuración de la app
+│   │
+│   ├── migrations/             # Migraciones de base de datos
+│   │   └── 0001_initial.py
+│   │
+│   ├── templates/              # Plantillas HTML
+│   │   ├── base.html           # Template padre (navbar, estructura base)
+│   │   ├── registration/
+│   │   │   └── login.html      # Formulario de login personalizado
+│   │   └── memberships/
+│   │       ├── landing.html           # Página principal pública
+│   │       ├── membership_list.html    # Listado de planes
+│   │       ├── membership_form.html    # Crear/editar plan
+│   │       ├── membership_confirm_delete.html
+│   │       ├── member_list.html        # Listado de miembros
+│   │       ├── member_form.html        # Crear/editar miembro
+│   │       ├── member_register.html    # Registro público de miembro
+│   │       ├── member_register_success.html
+│   │       ├── member_confirm_delete.html
+│   │       ├── admin_user_list.html    # Listado de usuarios admin
+│   │       └── admin_user_form.html    # Crear usuario admin
+│   │
+│   ├── static/                 # Archivos estáticos
+│   │   └── memberships/
+│   │       ├── styles.css      # Estilos globales
+│   │       ├── pages.css       # Estilos de formularios y contenedores
+│   │       └── landing.css     # Estilos de landing page
+│   │
+│   ├── templatetags/           # Filtros y tags personalizados
+│   │   └── currency_filters.py # Filtro para formato COP
+│   │
+│   └── __init__.py
+│
+└── reports/                    # Aplicación para reportes (estructura inicial)
+    └── ...
+```
+
+---
+
+## 🏗️ Arquitectura y Componentes
+
+### Models (memberships/models.py)
+
+#### **Membership**
+```python
+- name: CharField          # Nombre del plan (ej: "Plan Básico")
+- description: TextField   # Descripción del plan
+- price: DecimalField     # Precio mensual
+- duration_months: IntegerField  # Duración del plan (1, 3, 6, 12 meses)
+```
+
+#### **Member**
+```python
+- user: OneToOneField     # Relación con User de Django
+- membership: ForeignKey  # Plan contratado
+- document: CharField     # Documento identificación (único)
+- full_name: CharField    # Nombre completo
+- email: EmailField       # Email
+- phone: CharField        # Teléfono
+- status: CharField       # 'active' o 'inactive'
+- created_at: DateTimeField
+- updated_at: DateTimeField
+```
+
+---
+
+## 👁️ Views y Flujos de Control
+
+### Vistas Públicas (sin autenticación requerida)
+| Vista | URL | Método | Descripción |
+|-------|-----|--------|-------------|
+| **LandingPageView** | `/` | GET | Página principal con planes y CTA |
+| **UserRegistrationView** | `/register/` | GET, POST | Registro de nuevo administrador |
+| **CustomLoginView** | `/login/` | GET, POST | Login personalizado |
+| **MemberRegisterView** | `/member/register/` | GET, POST | Registro público de miembro |
+
+### Vistas Autenticadas (LoginRequiredMixin)
+| Vista | URL | Método | Descripción |
+|-------|-----|--------|-------------|
+| **MembershipListView** | `/memberships/` | GET | Listado de planes |
+| **MembershipCreateView** | `/memberships/create/` | GET, POST | Crear nuevo plan |
+| **MembershipUpdateView** | `/memberships/<id>/edit/` | GET, POST | Editar plan |
+| **MembershipDeleteView** | `/memberships/<id>/delete/` | GET, POST | Eliminar plan |
+| **MemberListView** | `/members/` | GET | Listado de miembros |
+| **MemberCreateView** | `/members/create/` | GET, POST | Agregar miembro |
+| **MemberUpdateView** | `/members/<id>/edit/` | GET, POST | Editar miembro |
+| **MemberDeleteView** | `/members/<id>/delete/` | GET, POST | Eliminar miembro |
+| **AdminUserCreateView** | `/administration/create-admin/` | GET, POST | Crear usuario admin |
+| **AdminUserListView** | `/administration/admins/` | GET | Listado de admins |
+
+---
+
+## 📝 Formularios (memberships/forms.py)
+
+### **MemberRegistrationForm**
+Formulario público para que nuevos miembros se registren. Valida:
+- Username único
+- Email único
+- Document (documento) único
+- Passwords coincidentes
+
+### **MemberAdminForm**
+Extiende MemberRegistrationForm, agrega campo `status` para que admins active/desactive miembros.
+
+### **AdminUserCreationForm**
+Crea usuarios con `is_staff=True` automáticamente, permitiendo que sean administradores del sistema.
+
+### **CustomAuthenticationForm**
+Formulario de login personalizado con estilos Bootstrap integrados.
+
+### **CustomUserCreationForm**
+Formulario para crear usuarios regulares con validaciones personalizadas.
+
+---
+
+## 🔐 Autenticación y Autorización
+
+### Flujo de Autenticación
+```
+Usuario → Login (/login/) → Django Auth Backend → Session
+                                      ↓
+                              is_authenticated = True
+                                      ↓
+                      Acceso a vistas con LoginRequiredMixin
+```
+
+### Roles y Permisos
+- **Usuario Anónimo**: Acceso a landing page y registro público
+- **Usuario Registrado (Member)**: Perfil visible en admin (status=active/inactive)
+- **Usuario Admin (is_staff=True)**: Acceso a panel administrativo completo
+
+### Decoradores y Mixins
+```python
+LoginRequiredMixin  # Protege vistas administrativas
+```
+
+---
+
+## 🎨 Frontend y Estilos
+
+### Estructura CSS
+```
+styles.css         → Estilos globales (variables CSS, componentes base)
+pages.css          → Estilos de formularios y contenedores (.form-grid, .form-span-2)
+landing.css        → Estilos específicos de landing page (hero, stats, features, planes)
+```
+
+### Variables CSS Globales (styles.css)
+```css
+--primary: #0056B3        /* Azul Cobalto */
+--accent: #00D4FF         /* Cian Eléctrico */
+--background: #E9ECEF     /* Gris Claro */
+--border: #DEE2E6         /* Gris Bordes */
+--muted: #6C757D          /* Gris Texto */
+```
+
+### Template Base
+- **base.html**: Template padre que incluye:
+  - Navbar dinámico con menu diferenciado (público vs admin)
+  - Bootstrap CDN
+  - Archivos CSS globales
+  - Bloques extensibles para título, contenido y CSS extra
+
+---
+
+## 🔄 Flujo de Datos
+
+### Registro de nuevo Miembro (Público)
+```
+1. Usuario accede a / → ve planes
+2. Click "Unirse Ahora" → member_register.html
+3. Completa MemberRegistrationForm → POST
+4. Sistema crea User + Member
+5. Redirige a member_register_success.html
+6. Admin revisa y activa (status='active')
+```
+
+### Creación de Nuevo Plan (Admin)
+```
+1. Admin autenticado → /memberships/
+2. Click "+ Crear Plan"
+3. Completa formulario → POST /memberships/create/
+4. Sistema crea Membership
+5. Redirige a /memberships/
+```
+
+### Administración de Usuarios Admin
+```
+1. Admin autenticado → /administration/admins/
+2. Click "+ Crear Admin"
+3. Completa formulario → POST /administration/create-admin/
+4. Sistema crea User con is_staff=True
+5. Usuario puede acceder a panel admin
+```
+
+---
+
+## 🔧 Funcionalidades Principales
+
+### ✅ Landing Page Pública
+- Hero section con CTA
+- Estadísticas del gimnasio
+- Showcase de features
+- Grid de planes disponibles
+- Sección de call-to-action final
+
+### ✅ Panel Administrativo
+- **Gestión de Planes**: CRUD completo de membresías
+- **Gestión de Miembros**: Crear, editar, eliminar, cambiar status
+- **Gestión de Admins**: Crear usuarios con acceso administrativo
+- **Navbar Dinámico**: Menu diferente si estás logueado vs sin loguear
+
+### ✅ Autenticación
+- Login/Logout
+- Registro de administradores
+- Registro público de miembros
+- Sessions basadas en Django Auth
+
+### ✅ Seguridad
+- CSRF Protection en formularios
+- Logout vía POST (no GET)
+- LoginRequiredMixin en vistas admin
+- Validaciones de formulario bidireccionales
+
+---
+
+## 📊 URLs y Rutas Principales
+
+```
+/                               → Landing Page (LandingPageView)
+/login/                        → Login (CustomLoginView)
+/logout/                       → Logout
+/register/                     → Registro de admin
+/member/register/              → Registro público de miembro
+
+/memberships/                  → Listado de planes
+/memberships/create/           → Crear plan
+/memberships/<id>/edit/        → Editar plan
+/memberships/<id>/delete/      → Eliminar plan
+
+/members/                      → Listado de miembros
+/members/create/               → Crear miembro
+/members/<id>/edit/            → Editar miembro
+/members/<id>/delete/          → Eliminar miembro
+
+/administration/admins/        → Listado de admins
+/administration/create-admin/  → Crear usuario admin
+```
+
+---
+
+## 🎯 Validaciones y Reglas de Negocio
+
+### Member
+- **Document**: Único en el sistema
+- **Email**: Único y válido
+- **Status**: 'active' o 'inactive' (por defecto 'inactive')
+- El registro público requiere aprobación admin
+
+### Membership
+- **Name**: Requerido
+- **Price**: Debe ser mayor a 0
+- **Duration**: En meses (1, 3, 6, 12)
+
+### Users Admin
+- Username único
+- Email único
+- Password must meet Django requirements
+- Automáticamente se asigna `is_staff=True`
+
+---
+
+## 🚀 Próximos Pasos / Mejoras Futuras
+
+- [ ] Agregar reportes de membresías activas
+- [ ] Implementar pagos (Stripe/PayPal)
+- [ ] Dashboard con gráficos de estadísticas
+- [ ] Sistema de renovación automática de membresías
+- [ ] Notificaciones por email
+- [ ] Control de asistencia
+- [ ] Integración con sistema de facturación
+
+---
+
+## 📞 Soporte
+
+Para preguntas o problemas, revisar los logs del servidor:
+```bash
+python manage.py runserver
+```
+
+---
+
+**Última actualización**: Marzo 2026  
+**Paleta de Colores:**
+- Azul Cobalto (#0056B3) - Color de acción
+- Cian Eléctrico (#00D4FF) - Guía visual
+- Blanco Níveo (#FFFFFF) - Fondo
+- Gris Claro (#E9ECEF) - Estructura
