@@ -5,9 +5,9 @@ from .views import (
     MembershipCreateView,
     MembershipUpdateView,
     MembershipDeleteView,
-    UserRegistrationView,
     AdminUserCreateView,
     AdminUserListView,
+    AdminUserDeleteView,
     MemberRegisterView,
     MemberRegisterSuccessView,
     MemberListView,
@@ -33,8 +33,8 @@ urlpatterns = [
     path("members/<int:pk>/edit/", MemberUpdateView.as_view(), name="member_edit"),
     path("members/<int:pk>/delete/", MemberDeleteView.as_view(), name="member_delete"),
     
-    # Auth URLs
-    path("auth/register/", UserRegistrationView.as_view(), name="user_register"),
+    # Admin Users URLs
     path("administration/create-admin/", AdminUserCreateView.as_view(), name="admin_user_create"),
     path("administration/admins/", AdminUserListView.as_view(), name="admin_user_list"),
+    path("administration/admins/<int:pk>/delete/", AdminUserDeleteView.as_view(), name="admin_user_delete"),
 ]

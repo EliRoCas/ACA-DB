@@ -294,9 +294,8 @@ ACA-DB/
 | Vista | URL | Método | Descripción |
 |-------|-----|--------|-------------|
 | **LandingPageView** | `/` | GET | Página principal con planes y CTA |
-| **UserRegistrationView** | `/register/` | GET, POST | Registro de nuevo administrador |
-| **CustomLoginView** | `/login/` | GET, POST | Login personalizado |
-| **MemberRegisterView** | `/member/register/` | GET, POST | Registro público de miembro |
+| **CustomLoginView** | `/accounts/login/` | GET, POST | Login personalizado |
+| **MemberRegisterView** | `/register/` | GET, POST | Registro público de miembro |
 
 ### Vistas Autenticadas (LoginRequiredMixin)
 | Vista | URL | Método | Descripción |
@@ -311,6 +310,7 @@ ACA-DB/
 | **MemberDeleteView** | `/members/<id>/delete/` | GET, POST | Eliminar miembro |
 | **AdminUserCreateView** | `/administration/create-admin/` | GET, POST | Crear usuario admin |
 | **AdminUserListView** | `/administration/admins/` | GET | Listado de admins |
+| **AdminUserDeleteView** | `/administration/admins/<id>/delete/` | GET, POST | Eliminar admin (excepto superusuario) |
 
 ---
 
@@ -341,7 +341,7 @@ Formulario para crear usuarios regulares con validaciones personalizadas.
 
 ### Flujo de Autenticación
 ```
-Usuario → Login (/login/) → Django Auth Backend → Session
+Usuario → Login (/accounts/login/) → Django Auth Backend → Session
                                       ↓
                               is_authenticated = True
                                       ↓
@@ -414,7 +414,7 @@ landing.css        → Estilos específicos de landing page (hero, stats, featur
 2. Click "+ Crear Admin"
 3. Completa formulario → POST /administration/create-admin/
 4. Sistema crea User con is_staff=True
-5. Usuario puede acceder a panel admin
+5. Desde el listado puede eliminar admins no-superusuario
 ```
 
 ---
@@ -431,12 +431,11 @@ landing.css        → Estilos específicos de landing page (hero, stats, featur
 ### ✅ Panel Administrativo
 - **Gestión de Planes**: CRUD completo de membresías
 - **Gestión de Miembros**: Crear, editar, eliminar, cambiar status
-- **Gestión de Admins**: Crear usuarios con acceso administrativo
+- **Gestión de Admins**: Crear y eliminar usuarios con acceso administrativo
 - **Navbar Dinámico**: Menu diferente si estás logueado vs sin loguear
 
 ### ✅ Autenticación
 - Login/Logout
-- Registro de administradores
 - Registro público de miembros
 - Sessions basadas en Django Auth
 
@@ -452,10 +451,9 @@ landing.css        → Estilos específicos de landing page (hero, stats, featur
 
 ```
 /                               → Landing Page (LandingPageView)
-/login/                        → Login (CustomLoginView)
-/logout/                       → Logout
-/register/                     → Registro de admin
-/member/register/              → Registro público de miembro
+/accounts/login/               → Login (CustomLoginView)
+/accounts/logout/              → Logout
+/register/                     → Registro público de miembro
 
 /memberships/                  → Listado de planes
 /memberships/create/           → Crear plan
@@ -469,6 +467,7 @@ landing.css        → Estilos específicos de landing page (hero, stats, featur
 
 /administration/admins/        → Listado de admins
 /administration/create-admin/  → Crear usuario admin
+/administration/admins/<id>/delete/ → Eliminar usuario admin (no superusuario)
 ```
 
 ---
@@ -491,6 +490,7 @@ landing.css        → Estilos específicos de landing page (hero, stats, featur
 - Email único
 - Password must meet Django requirements
 - Automáticamente se asigna `is_staff=True`
+- Un superusuario no puede eliminarse desde el flujo de administración
 
 ---
 

@@ -72,7 +72,7 @@
                   >Planes</a
                 >
               </li>
-              {% else %}
+              {% elif user.is_staff %}
               <li class="nav-item">
                 <a
                   class="nav-link"
@@ -95,7 +95,7 @@
                 >
               </li>
               {% endif %}
-              {% if user.is_authenticated %}
+              {% if user.is_authenticated and user.is_staff %}
               <li class="nav-item dropdown">
                 <button
                   class="nav-link dropdown-toggle btn btn-link"
@@ -117,6 +117,8 @@
                   </li>
                 </ul>
               </li>
+              {% endif %}
+              {% if user.is_authenticated %}
               <li class="nav-item dropdown">
                 <button
                   class="nav-link dropdown-toggle btn btn-link"

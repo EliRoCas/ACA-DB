@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Eliminar Administrador{% endblock %}
+{% block content %}
+<section class="membership-container form-page">
+  <div class="card card-custom form-card">
+    <header class="mb-3">
+      <h1 class="form-title">Eliminar usuario administrador</h1>
+      <p class="form-subtitle">Esta acción no se puede deshacer.</p>
+    </header>
+
+    <div class="alert alert-warning" role="alert">
+      ¿Confirmas que deseas eliminar al administrador <strong>{{ object.username }}</strong>?
+    </div>
+
+    <form method="post">
+      {% csrf_token %}
+      <div class="form-actions mt-4">
+        <a class="btn btn-outline-custom" href="{% url 'admin_user_list' %}">Cancelar</a>
+        <button class="btn btn-danger" type="submit">Eliminar</button>
+      </div>
+    </form>
+  </div>
+</section>
+{% endblock %}

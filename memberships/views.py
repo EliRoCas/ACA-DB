@@ -1,13 +1,24 @@
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.views.generic.edit import FormView
-from django.contrib.auth.forms import UserCreationForm
+from django.core.exceptions import PermissionDenied
+from django.shortcuts import redirect
 from .models import Membership, Member
-from .forms import CustomUserCreationForm, CustomAuthenticationForm, MemberRegistrationForm, MemberAdminForm, AdminUserCreationForm
+from .forms import CustomAuthenticationForm, MemberRegistrationForm, MemberAdminForm, AdminUserCreationForm
+
+
+class StaffRequiredMixin(UserPassesTestMixin):
+    def test_func(self):
+        return self.request.user.is_staff
+
+    def handle_no_permission(self):
+        if self.request.user.is_authenticated:
+            return redirect("membership_list")
+        return super().handle_no_permission()
 
 # Create your views here.
 class LandingPageView(TemplateView):
@@ -127,23 +138,13 @@ class MembershipDeleteView(LoginRequiredMixin, DeleteView):
     login_url = "login"
 
 
-class UserRegistrationView(FormView):
-    template_name = "memberships/user_registration.html"
-    form_class = CustomUserCreationForm
-    success_url = reverse_lazy("login")
-
-    def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
-
-
 class CustomLoginView(LoginView):
     form_class = CustomAuthenticationForm
     template_name = "registration/login.html"
     success_url = reverse_lazy("membership_list")
 
 
-class AdminUserCreateView(LoginRequiredMixin, CreateView):
+class AdminUserCreateView(LoginRequiredMixin, StaffRequiredMixin, CreateView):
     """Vista para que administradores creen otros usuarios administradores"""
     model = User
     form_class = AdminUserCreationForm
@@ -158,7 +159,7 @@ class AdminUserCreateView(LoginRequiredMixin, CreateView):
         return context
 
 
-class AdminUserListView(LoginRequiredMixin, ListView):
+class AdminUserListView(LoginRequiredMixin, StaffRequiredMixin, ListView):
     """Vista para listar usuarios administradores"""
     model = User
     template_name = "memberships/admin_user_list.html"
@@ -168,6 +169,20 @@ class AdminUserListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         # Solo mostrar usuarios que son staff (administradores)
         return User.objects.filter(is_staff=True).order_by('-date_joined')
+
+
+class AdminUserDeleteView(LoginRequiredMixin, StaffRequiredMixin, DeleteView):
+    """Eliminar usuarios administradores, excepto superusuarios"""
+    model = User
+    template_name = "memberships/admin_user_confirm_delete.html"
+    success_url = reverse_lazy("admin_user_list")
+    login_url = "login"
+
+    def dispatch(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        if self.object.is_superuser:
+            raise PermissionDenied("No se puede eliminar un superusuario.")
+        return super().dispatch(request, *args, **kwargs)
 
 
 # ========== MEMBER VIEWS ==========
