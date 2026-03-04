@@ -332,8 +332,8 @@ Crea usuarios con `is_staff=True` automáticamente, permitiendo que sean adminis
 ### **CustomAuthenticationForm**
 Formulario de login personalizado con estilos Bootstrap integrados.
 
-### **CustomUserCreationForm**
-Formulario para crear usuarios regulares con validaciones personalizadas.
+### **AdminUserCreationForm**
+Formulario para crear usuarios administradores (`is_staff=True`) con validaciones personalizadas.
 
 ---
 

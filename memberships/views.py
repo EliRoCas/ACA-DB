@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView, TemplateView
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -29,10 +28,6 @@ class LandingPageView(TemplateView):
         context['memberships'] = Membership.objects.all().order_by('price')
         context['member_count'] = 150  # Ejemplo
         return context
-
-def membership_list(request):
-    memberships = Membership.objects.all().order_by('price', "name")
-    return render(request, 'memberships/membership_list.html', {'memberships': memberships})
 
 class MembershipListView(LoginRequiredMixin, ListView):
     model = Membership
@@ -234,6 +229,5 @@ class MemberDeleteView(LoginRequiredMixin, DeleteView):
     """Eliminar un miembro"""
     model = Member
     template_name = "memberships/member_confirm_delete.html"
-    success_url = reverse_lazy("member_list")
     login_url = "login"
-    success_url = reverse_lazy("membership_list")
+    success_url = reverse_lazy("member_list")

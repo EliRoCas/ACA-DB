@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from .models import Member, Membership
+from .models import Member
 
 
 # Constants for form labels and messages
@@ -20,7 +20,6 @@ LABEL_STATUS = 'Estado'
 ERROR_USERNAME_EXISTS = 'Este nombre de usuario ya está en uso.'
 ERROR_DOCUMENT_EXISTS = 'Este documento ya está registrado.'
 
-PLACEHOLDER_USERNAME = 'Ej. miusuario123'
 # Form field placeholders - no sensitive data
 PLACEHOLDER_AUTH_SECRET = 'Ingresa una contraseña segura'
 PLACEHOLDER_AUTH_SECRET_CONFIRM = 'Repite tu contraseña'
@@ -30,48 +29,6 @@ PLACEHOLDER_FULL_NAME = 'Ej. Juan Pérez'
 PLACEHOLDER_DOCUMENT = 'Ej. 1234567890'
 PLACEHOLDER_PHONE = 'Ej. +57 300 123 4567'
 PLACEHOLDER_EMAIL = 'Ej. juanperez@gmail.com'
-
-
-class CustomUserCreationForm(UserCreationForm):
-    """Custom UserCreationForm with Bootstrap styling"""
-    
-    username = forms.CharField(
-        label=LABEL_USERNAME,
-        widget=forms.TextInput(attrs={
-            'class': 'form-control',
-            'placeholder': PLACEHOLDER_USERNAME,
-        })
-    )
-    password1 = forms.CharField(
-        label=LABEL_AUTH_SECRET,
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': PLACEHOLDER_AUTH_SECRET,
-        })
-    )
-    password2 = forms.CharField(
-        label=LABEL_AUTH_SECRET_CONFIRM,
-        widget=forms.PasswordInput(attrs={
-            'class': 'form-control',
-            'placeholder': PLACEHOLDER_AUTH_SECRET_CONFIRM,
-        })
-    )
-    
-    class Meta:
-        model = User
-        fields = ('username', 'password1', 'password2')
-
-    def clean_username(self):
-        username = self.cleaned_data.get('username')
-        if User.objects.filter(username=username).exists():
-            raise forms.ValidationError(ERROR_USERNAME_EXISTS)
-        return username
-
-    def save(self, commit=True):
-        user = super().save(commit=False)
-        if commit:
-            user.save()
-        return user
 
 
 class CustomAuthenticationForm(AuthenticationForm):
