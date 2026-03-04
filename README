@@ -158,9 +158,45 @@ git rm --cached .env
 ```
 
 ### ⚠️ Reglas Importantes
-- ✅ **Commitear**: `.env.example`, `settings.py`, `.gitignore`
-- ❌ **NUNCA commitear**: `.env`, `db.sqlite3`
-- 🔒 Cada desarrollador tiene sus propios valores SECRET_KEY y DEBUG
+- ✅ Generar tu **propia** SECRET_KEY en tu máquina
+- ✅ Guardar `.env` **solo localmente**
+- ✅ Usar [TEAM_SETUP.md](TEAM_SETUP.md) para la configuración paso-a-paso
+- ❌ **NUNCA** compartir tu `.env` con nadie
+- ❌ **NUNCA** commitear `.env` a Git
+- ❌ **NUNCA** usar la misma SECRET_KEY que otro miembro del equipo
+
+---
+
+## 📖 Para Miembros del Equipo
+
+**Consulta el archivo [TEAM_SETUP.md](TEAM_SETUP.md) para:**
+- 8 pasos detallados de configuración inicial
+- Instrucciones de cómo generar tu propia SECRET_KEY
+- Solución de problemas comunes (4 casos reales)
+- Git workflow completo con 11 pasos
+- Pre-commit checklist
+- Preguntas frecuentes
+
+**Resumen rápido:**
+```bash
+# 1. Clonar
+git clone <url> && cd ACA-DB
+
+# 2. Crear venv y activar (Windows)
+python -m venv venv && .\venv\Scripts\Activate.ps1
+
+# 3. Instalar
+pip install -r requirements.txt
+
+# 4. Copiar y editar .env (cambia SECRET_KEY)
+copy .env.example .env
+# → Genera tu clave: python -c "from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())"
+# → Pega en .env
+
+# 5. Migrar y ejecutar
+python manage.py migrate
+python manage.py runserver
+```
 
 ---
 
