@@ -1,0 +1,75 @@
+/* ============================================
+   MEMBER REGISTER SUCCESS STYLES
+   ============================================ */
+
+.register-success-card {
+  max-width: 650px;
+  margin: 2rem auto;
+}
+
+.success-container {
+  text-align: center;
+}
+
+.success-emoji {
+  font-size: 4rem;
+  margin-bottom: 20px;
+}
+
+.success-subtitle {
+  margin-bottom: 30px;
+}
+
+.payment-instructions {
+  text-align: left;
+}
+
+.instruction-list {
+  margin-bottom: 0;
+  padding-left: 20px;
+}
+
+.contact-info {
+  text-align: left;
+  margin-top: 1rem;
+}
+
+.form-actions-centered {
+  margin-top: 30px;
+}
+
+.success-footer {
+  font-size: 0.85rem;
+}
+
+/* ============================================
+   PAYMENT METHODS SECTION STYLES
+   ============================================ */
+
+.payment-methods-section {
+  background: #f9f9f9;
+  border-radius: 8px;
+  border-left: 4px solid #6200ea;
+  margin-top: 1.5rem;
+  padding: 1rem;
+}
+
+/* ============================================
+   MEMBER LIST STYLES
+   ============================================ */
+
+.badge-nowrap {
+  white-space: nowrap;
+}
+
+.badge-light-custom {
+  border-color: var(--border) !important;
+}
+
+/* ============================================
+   REGISTER PAGE FOOTER
+   ============================================ */
+
+.register-footer {
+  font-size: 0.9rem;
+}

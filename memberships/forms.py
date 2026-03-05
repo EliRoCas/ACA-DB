@@ -16,6 +16,8 @@ LABEL_PHONE = 'Teléfono'
 LABEL_EMAIL = 'Correo Electrónico'
 LABEL_MEMBERSHIP = 'Plan de Membresía'
 LABEL_STATUS = 'Estado'
+LABEL_EXPIRES_AT = 'Fecha de Vencimiento'
+LABEL_PAYMENT_METHOD = 'Método de Pago'
 
 ERROR_USERNAME_EXISTS = 'Este nombre de usuario ya está en uso.'
 ERROR_DOCUMENT_EXISTS = 'Este documento ya está registrado.'
@@ -98,6 +100,19 @@ class AdminUserCreationForm(UserCreationForm):
 class MemberRegistrationForm(forms.ModelForm):
     """Form para que clientes se registren como miembros del gimnasio (formulario público)"""
     
+    PAYMENT_METHOD_CHOICES = [
+        ('cash', 'Efectivo (Pagar en el gimnasio)'),
+        ('pse', 'PSE (Pago en línea)'),
+        ('card', 'Tarjeta de Crédito/Débito'),
+    ]
+    
+    payment_method = forms.ChoiceField(
+        choices=PAYMENT_METHOD_CHOICES,
+        widget=forms.RadioSelect,
+        label=LABEL_PAYMENT_METHOD,
+        initial='cash'
+    )
+    
     class Meta:
         model = Member
         fields = ['full_name', 'document', 'phone', 'email', 'membership']
@@ -131,6 +146,9 @@ class MemberRegistrationForm(forms.ModelForm):
         self.fields['phone'].label = LABEL_PHONE
         self.fields['email'].label = LABEL_EMAIL
         self.fields['membership'].label = LABEL_MEMBERSHIP
+        
+        # Información adicional
+        self.fields['membership'].help_text = 'Selecciona el plan que mejor se adapte a tus necesidades'
     
     def clean_document(self):
         document = self.cleaned_data.get('document')
@@ -140,20 +158,39 @@ class MemberRegistrationForm(forms.ModelForm):
 
 
 class MemberAdminForm(forms.ModelForm):
-    """Form para administradores (incluye estado)"""
+    """Form para administradores (incluye estado y método de pago)"""
+    
+    PAYMENT_METHOD_CHOICES = [
+        ('cash', 'Efectivo (Cambio manual de estado)'),
+        ('card', 'Tarjeta de Crédito/Débito'),
+    ]
+    
+    payment_method = forms.ChoiceField(
+        choices=PAYMENT_METHOD_CHOICES,
+        widget=forms.RadioSelect,
+        label=LABEL_PAYMENT_METHOD,
+        initial='cash',
+        required=False,
+        help_text='Selecciona el método de pago que utilizará este miembro'
+    )
     
     class Meta:
         model = Member
-        fields = ['full_name', 'document', 'phone', 'email', 'membership', 'status']
+        fields = ['full_name', 'document', 'phone', 'email', 'membership', 'status', 'membership_expires_at']
     
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         
-        # Aplicar estilos Bootstrap a todos los campos
+        # Si estamos editando, usar el payment_method guardado como valor inicial
+        if self.instance.pk and self.instance.payment_method:
+            self.fields['payment_method'].initial = self.instance.payment_method
+        
+        # Aplicar estilos Bootstrap a todos los campos (excepto payment_method que usa RadioSelect)
         for field_name, field in self.fields.items():
-            field.widget.attrs.update({
-                'class': 'form-control',
-            })
+            if field_name != 'payment_method':
+                field.widget.attrs.update({
+                    'class': 'form-control',
+                })
         
         # Personalizaciones específicas
         self.fields['full_name'].widget.attrs.update({
@@ -176,6 +213,17 @@ class MemberAdminForm(forms.ModelForm):
         self.fields['email'].label = LABEL_EMAIL
         self.fields['membership'].label = LABEL_MEMBERSHIP
         self.fields['status'].label = LABEL_STATUS
+        self.fields['membership_expires_at'].label = LABEL_EXPIRES_AT
+        
+        # Hacer membership_expires_at opcional visualmente
+        self.fields['membership_expires_at'].required = False
+        self.fields['membership_expires_at'].help_text = 'Dejar vacío si aún no tiene membresía activa. Se calculará automáticamente al registrar un pago.'
+        
+        # Configurar el widget de fecha
+        self.fields['membership_expires_at'].widget.attrs.update({
+            'type': 'date',
+            'class': 'form-control',
+        })
     
     def clean_document(self):
         document = self.cleaned_data.get('document')
@@ -187,3 +235,134 @@ class MemberAdminForm(forms.ModelForm):
             if Member.objects.filter(document=document).exists():
                 raise forms.ValidationError(ERROR_DOCUMENT_EXISTS)
         return document
+
+
+class SimulatedPSEPaymentForm(forms.Form):
+    """Formulario simulado para pago PSE"""
+    
+    BANK_CHOICES = [
+        ('', 'Selecciona tu banco'),
+        ('bancolombia', 'Bancolombia'),
+        ('davivienda', 'Davivienda'),
+        ('banco_bogota', 'Banco de Bogotá'),
+        ('bbva', 'BBVA'),
+        ('banco_popular', 'Banco Popular'),
+        ('colpatria', 'Colpatria'),
+        ('av_villas', 'AV Villas'),
+    ]
+    
+    PERSON_TYPE_CHOICES = [
+        ('natural', 'Persona Natural'),
+        ('juridica', 'Persona Jurídica'),
+    ]
+    
+    bank = forms.ChoiceField(
+        choices=BANK_CHOICES,
+        label='Banco',
+        widget=forms.Select(attrs={
+            'class': 'form-control',
+        })
+    )
+    
+    person_type = forms.ChoiceField(
+        choices=PERSON_TYPE_CHOICES,
+        label='Tipo de Persona',
+        widget=forms.RadioSelect(),
+        initial='natural'
+    )
+    
+    document_number = forms.CharField(
+        label='Número de Documento',
+        max_length=20,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Ej. 1234567890'
+        })
+    )
+    
+    def clean_bank(self):
+        bank = self.cleaned_data.get('bank')
+        if not bank:
+            raise forms.ValidationError('Debes seleccionar un banco')
+        return bank
+
+
+class SimulatedCardPaymentForm(forms.Form):
+    """Formulario simulado para pago con tarjeta"""
+    
+    card_number = forms.CharField(
+        label='Número de Tarjeta',
+        max_length=19,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': '1234 5678 9012 3456',
+            'maxlength': '19',
+            'pattern': '[0-9 ]*'
+        })
+    )
+    
+    cardholder_name = forms.CharField(
+        label='Nombre del Titular',
+        max_length=100,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'Nombre como aparece en la tarjeta',
+            'style': 'text-transform: uppercase;'
+        })
+    )
+    
+    expiry_date = forms.CharField(
+        label='Fecha de Vencimiento',
+        max_length=5,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control',
+            'placeholder': 'MM/AA',
+            'maxlength': '5',
+            'pattern': '[0-9/]*'
+        })
+    )
+    
+    cvv = forms.CharField(
+        label='CVV',
+        max_length=4,
+        widget=forms.PasswordInput(attrs={
+            'class': 'form-control',
+            'placeholder': '***',
+            'maxlength': '4',
+            'pattern': '[0-9]*'
+        })
+    )
+    
+    def clean_card_number(self):
+        card_number = self.cleaned_data.get('card_number', '').replace(' ', '')
+        if not card_number.isdigit():
+            raise forms.ValidationError('El número de tarjeta debe contener solo dígitos')
+        if len(card_number) < 13 or len(card_number) > 19:
+            raise forms.ValidationError('Número de tarjeta inválido')
+        return card_number
+    
+    def clean_cvv(self):
+        cvv = self.cleaned_data.get('cvv', '')
+        if not cvv.isdigit():
+            raise forms.ValidationError('El CVV debe contener solo dígitos')
+        if len(cvv) < 3 or len(cvv) > 4:
+            raise forms.ValidationError('CVV inválido')
+        return cvv
+    
+    def clean_expiry_date(self):
+        expiry = self.cleaned_data.get('expiry_date', '')
+        error_msg = 'Formato inválido. Use MM/AA'
+        
+        if '/' not in expiry:
+            raise forms.ValidationError(error_msg)
+        parts = expiry.split('/')
+        if len(parts) != 2:
+            raise forms.ValidationError(error_msg)
+        month, year = parts
+        if not month.isdigit() or not year.isdigit():
+            raise forms.ValidationError('El mes y año deben ser numéricos')
+        if len(month) != 2 or len(year) != 2:
+            raise forms.ValidationError(error_msg)
+        if int(month) < 1 or int(month) > 12:
+            raise forms.ValidationError('Mes inválido')
+        return expiry

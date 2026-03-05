@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block title %}Pago Exitoso{% endblock %}
+
+{% block content %}
+<section class="membership-container payment-success-container">
+  <div class="card card-custom payment-success-card">
+    <div class="success-icon">
+      ✅
+    </div>
+    
+    <h1 class="success-title">¡Pago Exitoso!</h1>
+    
+    <p class="success-subtitle">
+      Tu pago ha sido procesado correctamente (modo simulación)
+    </p>
+
+    {% if member %}
+    <div class="payment-details">
+      <h5>📝 Detalles del Pago</h5>
+      <div class="detail-row">
+        <strong>Miembro:</strong> {{ member.full_name }}
+      </div>
+      <div class="detail-row">
+        <strong>Documento:</strong> {{ member.document }}
+      </div>
+      <div class="detail-row">
+        <strong>Plan:</strong> {{ member.membership.name }}
+      </div>
+      <div class="detail-row">
+        <strong>Estado:</strong> 
+        <span class="status-badge">
+          ✓ ACTIVO
+        </span>
+      </div>
+      {% if member.membership_expires_at %}
+      <div class="detail-row">
+        <strong>Vence:</strong> {{ member.membership_expires_at|date:"d/m/Y" }}
+      </div>
+      {% endif %}
+    </div>
+    {% endif %}
+
+    <div class="success-alert">
+      <strong>🎉 ¡Bienvenido a FitGym!</strong><br>
+      Tu membresía está activa y puedes comenzar a disfrutar de todas nuestras instalaciones.
+    </div>
+
+    <div class="info-alert">
+      <strong>📧 Confirmación:</strong> Recibirás un correo con los detalles de tu membresía (modo demo).
+    </div>
+
+    <div class="actions">
+      <a href="{% url 'landing' %}" class="btn btn-primary-custom btn-lg">
+        Volver al Inicio
+      </a>
+    </div>
+
+    <p class="demo-notice">
+      🔒 Este fue un pago simulado. No se realizó ningún cargo real a tu cuenta.
+    </p>
+  </div>
+</section>
+{% endblock %}

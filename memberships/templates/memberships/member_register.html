@@ -43,19 +43,89 @@
           {{ form.membership }} {% if form.membership.errors %}
           <div class="field-error">{{ form.membership.errors|striptags }}</div>
           {% endif %}
+          {% if form.membership.help_text %}
+          <small class="form-text text-muted">{{ form.membership.help_text }}</small>
+          {% endif %}
+        </div>
+
+        <div class="form-group form-span-2">
+          <label class="form-label" for="{{ form.payment_method.id_for_label }}">{{ form.payment_method.label }}</label>
+          <div class="payment-methods mt-2">
+            {% for radio in form.payment_method %}
+            <div class="payment-option">
+              <label class="payment-label" for="{{ radio.id_for_label }}">
+                {{ radio.tag }}
+                <span class="payment-text">{{ radio.choice_label }}</span>
+              </label>
+            </div>
+            {% endfor %}
+          </div>
+          {% if form.payment_method.errors %}
+          <div class="field-error">{{ form.payment_method.errors|striptags }}</div>
+          {% endif %}
+          <small class="form-text text-muted">
+            <strong>Efectivo:</strong> Completa el pago en el gimnasio.<br>
+            <strong>PSE/Tarjeta:</strong> Pago en línea simulado (demo).
+          </small>
         </div>
       </div>
 
       <div class="form-actions mt-4">
         <a class="btn btn-outline-custom" href="{% url 'landing' %}">Cancelar</a>
-        <button class="btn btn-primary-custom" type="submit">Registrarse</button>
+        <button class="btn btn-primary-custom" type="submit">Continuar al Pago</button>
       </div>
     </form>
 
-    <p class="text-center mt-4 text-muted" style="font-size: 0.9rem;">
-      Después de registrarte, nuestro equipo confirmará tu membresía.
+    <p class="text-center mt-4 text-muted register-footer">
+      🔒 Sistema de pago simulado (modo demostración)
     </p>
   </div>
 </section>
+
+<style>
+.payment-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.payment-option {
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.payment-option:hover {
+  border-color: #6200ea;
+  background: #f5f0ff;
+}
+
+.payment-option:has(input:checked) {
+  border-color: #6200ea;
+  background: #f0e6ff;
+}
+
+.payment-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  margin: 0;
+  font-weight: 500;
+}
+
+.payment-label input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.payment-text {
+  font-size: 1rem;
+  color: #333;
+}
+</style>
 
 {% endblock %}

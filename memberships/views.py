@@ -6,8 +6,14 @@ from django.contrib.auth.views import LoginView
 from django.views.generic.edit import FormView
 from django.core.exceptions import PermissionDenied
 from django.shortcuts import redirect
-from .models import Membership, Member
-from .forms import CustomAuthenticationForm, MemberRegistrationForm, MemberAdminForm, AdminUserCreationForm
+from django.urls import reverse
+from django.utils import timezone
+from django.contrib import messages
+from datetime import timedelta
+from dateutil.relativedelta import relativedelta
+from .models import Membership, Member, Payment
+from .forms import (CustomAuthenticationForm, MemberRegistrationForm, MemberAdminForm, 
+                    AdminUserCreationForm, SimulatedPSEPaymentForm, SimulatedCardPaymentForm)
 
 
 class StaffRequiredMixin(UserPassesTestMixin):
@@ -186,16 +192,145 @@ class MemberRegisterView(FormView):
     """Vista pública para que los clientes se registren como miembros"""
     template_name = "memberships/member_register.html"
     form_class = MemberRegistrationForm
-    success_url = reverse_lazy("member_register_success")
 
     def form_valid(self, form):
-        form.save()
-        return super().form_valid(form)
+        # Guardar el miembro
+        member = form.save()
+        payment_method = form.cleaned_data.get('payment_method')
+        
+        # Guardar el método de pago en el miembro
+        member.payment_method = payment_method
+        member.save()
+        
+        # Guardar datos en sesión para el pago
+        self.request.session['pending_member_id'] = member.id
+        self.request.session['pending_membership_id'] = member.membership.id if member.membership else None
+        self.request.session['pending_payment_method'] = payment_method
+        
+        # Redirigir según el método de pago seleccionado
+        if payment_method == 'cash':
+            # Para efectivo, ir directo a página de éxito (sin pago automático)
+            return redirect('member_register_success')
+        elif payment_method == 'pse':
+            # Redirigir a simulación de pago PSE
+            return redirect('simulated_pse_payment')
+        elif payment_method == 'card':
+            # Redirigir a simulación de pago con tarjeta
+            return redirect('simulated_card_payment')
+        
+        return redirect('member_register_success')
+    
+    def get_success_url(self):
+        return reverse('member_register_success')
 
 
 class MemberRegisterSuccessView(TemplateView):
     """Página de éxito después de registrarse como miembro"""
     template_name = "memberships/member_register_success.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        # Obtener método de pago de la sesión
+        payment_method = self.request.session.get('pending_payment_method', 'cash')
+        context['payment_method'] = payment_method
+        
+        # Limpiar sesión
+        self.request.session.pop('pending_member_id', None)
+        self.request.session.pop('pending_membership_id', None)
+        self.request.session.pop('pending_payment_method', None)
+        
+        return context
+
+
+class SimulatedPSEPaymentView(FormView):
+    """Vista simulada para pago PSE"""
+    template_name = "memberships/simulated_pse_payment.html"
+    form_class = SimulatedPSEPaymentForm
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Verificar que haya un pago pendiente
+        if 'pending_member_id' not in request.session:
+            return redirect('member_register')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        member_id = self.request.session.get('pending_member_id')
+        if member_id:
+            member = Member.objects.get(id=member_id)
+            context['member'] = member
+            context['amount'] = member.membership.price if member.membership else 0
+        return context
+    
+    def form_valid(self, form):
+        # Simular procesamiento de pago PSE
+        member_id = self.request.session.get('pending_member_id')
+        member = Member.objects.get(id=member_id)
+        
+        # Crear pago simulado
+        if member.membership:
+            Payment.objects.create(
+                member=member,
+                amount=member.membership.price,
+                method='transfer',  # PSE es transferencia
+            )
+        
+        return redirect('payment_success')
+
+
+class SimulatedCardPaymentView(FormView):
+    """Vista simulada para pago con tarjeta"""
+    template_name = "memberships/simulated_card_payment.html"
+    form_class = SimulatedCardPaymentForm
+    
+    def dispatch(self, request, *args, **kwargs):
+        # Verificar que haya un pago pendiente
+        if 'pending_member_id' not in request.session:
+            return redirect('member_register')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        member_id = self.request.session.get('pending_member_id')
+        if member_id:
+            member = Member.objects.get(id=member_id)
+            context['member'] = member
+            context['amount'] = member.membership.price if member.membership else 0
+        return context
+    
+    def form_valid(self, form):
+        # Simular procesamiento de pago con tarjeta
+        member_id = self.request.session.get('pending_member_id')
+        member = Member.objects.get(id=member_id)
+        
+        # Crear pago simulado
+        if member.membership:
+            Payment.objects.create(
+                member=member,
+                amount=member.membership.price,
+                method='card',
+            )
+        
+        return redirect('payment_success')
+
+
+class PaymentSuccessView(TemplateView):
+    """Página de éxito después de completar un pago simulado"""
+    template_name = "memberships/payment_success.html"
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        member_id = self.request.session.get('pending_member_id')
+        if member_id:
+            member = Member.objects.get(id=member_id)
+            context['member'] = member
+        
+        # Limpiar sesión
+        self.request.session.pop('pending_member_id', None)
+        self.request.session.pop('pending_membership_id', None)
+        self.request.session.pop('pending_payment_method', None)
+        
+        return context
 
 
 class MemberListView(LoginRequiredMixin, ListView):
@@ -205,6 +340,11 @@ class MemberListView(LoginRequiredMixin, ListView):
     context_object_name = "members"
     ordering = ["-created_at"]
     login_url = "login"
+    
+    def get_queryset(self):
+        """Obtiene la lista de miembros sin modificar sus estados manualmente establecidos"""
+        queryset = super().get_queryset()
+        return queryset
 
 
 class MemberCreateView(LoginRequiredMixin, CreateView):
@@ -214,6 +354,30 @@ class MemberCreateView(LoginRequiredMixin, CreateView):
     template_name = "memberships/member_form.html"
     success_url = reverse_lazy("member_list")
     login_url = "login"
+    
+    def form_valid(self, form):
+        """Guardar el miembro y procesar el pago si es necesario"""
+        self.object = form.save(commit=False)
+        # Guardar el método de pago
+        payment_method = form.cleaned_data.get('payment_method', 'cash')
+        self.object.payment_method = payment_method
+        # Usar skip_status_update=True para respetar el estado manual del formulario
+        self.object.save(skip_status_update=True)
+        
+        # Si el método de pago es Tarjeta y hay membresía, crear Payment automático
+        if payment_method == 'card' and self.object.membership:
+            Payment.objects.create(
+                member=self.object,
+                amount=self.object.membership.price,
+                method='card',
+            )
+            # Mostrar mensaje de éxito con pago registrado
+            messages.success(
+                self.request,
+                'Miembro creado exitosamente. Pago registrado automáticamente.'
+            )
+        
+        return redirect(self.get_success_url())
 
 
 class MemberUpdateView(LoginRequiredMixin, UpdateView):
@@ -223,6 +387,57 @@ class MemberUpdateView(LoginRequiredMixin, UpdateView):
     template_name = "memberships/member_form.html"
     success_url = reverse_lazy("member_list")
     login_url = "login"
+    
+    def form_valid(self, form):
+        """Guardar el miembro y recalcular fechas si cambia el plan"""
+        # Obtener el miembro original antes de cambios
+        original_member = Member.objects.get(pk=self.object.pk)
+        original_plan = original_member.membership
+        
+        self.object = form.save(commit=False)
+        # Guardar el método de pago
+        payment_method = form.cleaned_data.get('payment_method', 'cash')
+        self.object.payment_method = payment_method
+        
+        # Verificar si el plan cambió
+        new_plan = self.object.membership
+        plan_changed = original_plan != new_plan
+        
+        # Si el plan cambió, recalcular la fecha de vencimiento desde hoy
+        if plan_changed and new_plan:
+            today = timezone.now().date()
+            self.object.membership_expires_at = today + relativedelta(months=new_plan.duration_months)
+        
+        # Usar skip_status_update=True para respetar el estado manual del formulario
+        self.object.save(skip_status_update=True)
+        
+        # Si el método de pago es Tarjeta y hay membresía, crear Payment automático
+        if payment_method == 'card' and self.object.membership:
+            # Verificar que no exista un pago reciente para evitar duplicados
+            recent_payment = Payment.objects.filter(
+                member=self.object,
+                created_at__gte=timezone.now() - timedelta(hours=1)
+            ).exists()
+            
+            if not recent_payment:
+                Payment.objects.create(
+                    member=self.object,
+                    amount=self.object.membership.price,
+                    method='card',
+                )
+                # Mostrar mensaje de éxito con pago registrado
+                messages.success(
+                    self.request,
+                    'Miembro actualizado exitosamente. Pago registrado.'
+                )
+        elif plan_changed:
+            # Mostrar mensaje si solo cambió el plan
+            messages.success(
+                self.request,
+                'Miembro actualizado exitosamente. Fecha de vencimiento recalculada.'
+            )
+        
+        return redirect(self.get_success_url())
 
 
 class MemberDeleteView(LoginRequiredMixin, DeleteView):

@@ -1,25 +1,49 @@
 {% extends "base.html" %} {% block title %}Registro Exitoso{% endblock %} {% block content %}
 <section class="membership-container form-page">
-  <div class="card card-custom form-card">
-    <div style="text-align: center;">
-      <div style="font-size: 4rem; margin-bottom: 20px;">✅</div>
+  <div class="card card-custom form-card register-success-card">
+    <div class="success-container">
+      <div class="success-emoji">✅</div>
       <h1 class="form-title">¡Registro Exitoso!</h1>
-      <p class="form-subtitle" style="margin-bottom: 30px;">
+      <p class="form-subtitle success-subtitle">
         Tu solicitud de membresía ha sido recibida correctamente.
       </p>
 
-      <div class="alert alert-info" role="alert" style="text-align: left;">
+      {% if payment_method == 'cash' %}
+      <div class="alert alert-warning payment-instructions" role="alert">
+        <h5>💵 Pago en Efectivo</h5>
+        <p class="mb-2">Has seleccionado <strong>pago en efectivo</strong>. Para activar tu membresía:</p>
+        <ul class="instruction-list">
+          <li>Visita nuestras instalaciones en horario de atención</li>
+          <li>Completa el pago en recepción</li>
+          <li>El administrador activará tu membresía inmediatamente</li>
+          <li>Podrás comenzar a usar el gimnasio el mismo día</li>
+        </ul>
+      </div>
+      
+      <div class="alert alert-info mt-3 contact-info" role="alert">
+        <h6>📍 Información de Contacto</h6>
+        <p class="mb-1"><strong>Dirección:</strong> Calle Principal #123, Centro</p>
+        <p class="mb-1"><strong>Horario:</strong> Lun-Vie 6am-10pm, Sáb-Dom 8am-8pm</p>
+        <p class="mb-0"><strong>Teléfono:</strong> +57 300 123 4567</p>
+      </div>
+      {% else %}
+      <div class="alert alert-info payment-instructions" role="alert">
         <h5>¿Qué sucede ahora?</h5>
-        <ul style="margin-bottom: 0; padding-left: 20px;">
+        <ul class="instruction-list">
           <li>Nuestro equipo revisará tu solicitud en las próximas 24 horas.</li>
-          <li>Te enviaremos un correo de confirmación a <strong>{{ form.email.value }}</strong></li>
+          <li>Te enviaremos un correo de confirmación</li>
           <li>Una vez aprobado, podrás acceder a todas las instalaciones de FitGym.</li>
         </ul>
       </div>
+      {% endif %}
 
-      <div style="margin-top: 30px;">
+      <div class="form-actions-centered">
         <a href="{% url 'landing' %}" class="btn btn-primary-custom">Volver al Inicio</a>
       </div>
+
+      <p class="text-muted mt-4 success-footer">
+        📧 Recibirás un correo de confirmación con todos los detalles
+      </p>
     </div>
   </div>
 </section>

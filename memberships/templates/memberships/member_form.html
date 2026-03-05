@@ -53,7 +53,41 @@
           {% endif %}
         </div>
         {% endif %}
+
+        {% if form.membership_expires_at %}
+        <div class="form-group">
+          <label class="form-label" for="{{ form.membership_expires_at.id_for_label }}">{{ form.membership_expires_at.label }}</label>
+          {{ form.membership_expires_at }} {% if form.membership_expires_at.errors %}
+          <div class="field-error">{{ form.membership_expires_at.errors|striptags }}</div>
+          {% endif %}
+          {% if form.membership_expires_at.help_text %}
+          <small class="form-text text-muted d-block mt-1">{{ form.membership_expires_at.help_text }}</small>
+          {% endif %}
+        </div>
+        {% endif %}
       </div>
+
+      {% if form.payment_method %}
+      <div class="payment-methods-section mt-4 p-3">
+        <label class="form-label" for="{{ form.payment_method.id_for_label }}">{{ form.payment_method.label }}</label>
+        {% if form.payment_method.help_text %}
+        <p class="small text-muted mb-2">{{ form.payment_method.help_text }}</p>
+        {% endif %}
+        <div class="payment-methods mt-2">
+          {% for radio in form.payment_method %}
+          <div class="payment-option">
+            <label class="payment-label" for="{{ radio.id_for_label }}">
+              {{ radio.tag }}
+              <span class="payment-text">{{ radio.choice_label }}</span>
+            </label>
+          </div>
+          {% endfor %}
+        </div>
+        {% if form.payment_method.errors %}
+        <div class="field-error mt-2">{{ form.payment_method.errors|striptags }}</div>
+        {% endif %}
+      </div>
+      {% endif %}
 
       <div class="form-actions mt-4">
         <a class="btn btn-outline-custom" href="{% url 'member_list' %}">Cancelar</a>
@@ -64,5 +98,51 @@
     </form>
   </div>
 </section>
+
+<style>
+.payment-methods {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.payment-option {
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.payment-option:hover {
+  border-color: #6200ea;
+  background: #f5f0ff;
+}
+
+.payment-option:has(input:checked) {
+  border-color: #6200ea;
+  background: #f0e6ff;
+}
+
+.payment-label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  cursor: pointer;
+  margin: 0;
+  font-weight: 500;
+}
+
+.payment-label input[type="radio"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+}
+
+.payment-text {
+  font-size: 0.95rem;
+  color: #333;
+}
+</style>
 
 {% endblock %}

@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% load currency_filters %}
+
+{% block title %}Pago con Tarjeta - Simulación{% endblock %}
+
+{% block content %}
+<section class="membership-container form-page">
+  <div class="card card-custom form-card card-payment-card">
+    <header class="mb-3 text-center">
+      <div class="card-icons mb-3">
+        💳 💰
+      </div>
+      <h1 class="form-title">Pago con Tarjeta</h1>
+      <p class="form-subtitle">Ingresa los datos de tu tarjeta</p>
+    </header>
+
+    <div class="payment-summary">
+      <div>
+        <strong>Miembro:</strong>
+        <span>{{ member.full_name }}</span>
+      </div>
+      <div>
+        <strong>Plan:</strong>
+        <span>{{ member.membership.name }}</span>
+      </div>
+      <div>
+        <strong>Total a Pagar:</strong>
+        <span class="payment-amount">{{ amount|cop_currency }}</span>
+      </div>
+    </div>
+
+    <form method="post" novalidate id="cardForm">
+      {% csrf_token %}
+
+      <div class="form-group mb-3">
+        <label class="form-label" for="{{ form.card_number.id_for_label }}">{{ form.card_number.label }}</label>
+        {{ form.card_number }}
+        {% if form.card_number.errors %}
+        <div class="field-error">{{ form.card_number.errors|striptags }}</div>
+        {% endif %}
+        <small class="form-text text-muted">Ej: 4111 1111 1111 1111</small>
+      </div>
+
+      <div class="form-group mb-3">
+        <label class="form-label" for="{{ form.cardholder_name.id_for_label }}">{{ form.cardholder_name.label }}</label>
+        {{ form.cardholder_name }}
+        {% if form.cardholder_name.errors %}
+        <div class="field-error">{{ form.cardholder_name.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div class="row">
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label" for="{{ form.expiry_date.id_for_label }}">{{ form.expiry_date.label }}</label>
+            {{ form.expiry_date }}
+            {% if form.expiry_date.errors %}
+            <div class="field-error">{{ form.expiry_date.errors|striptags }}</div>
+            {% endif %}
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="form-group mb-3">
+            <label class="form-label" for="{{ form.cvv.id_for_label }}">{{ form.cvv.label }}</label>
+            {{ form.cvv }}
+            {% if form.cvv.errors %}
+            <div class="field-error">{{ form.cvv.errors|striptags }}</div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <div class="alert alert-info mt-3">
+        <strong>ℹ️ Modo Simulación:</strong> Este es un pago simulado. No se realizará ningún cargo real. 
+        Puedes usar cualquier número de tarjeta de prueba.
+      </div>
+
+      <div class="form-actions mt-4">
+        <a class="btn btn-outline-custom" href="{% url 'landing' %}">Cancelar</a>
+        <button class="btn btn-primary-custom" type="submit">
+          <span>💳 Pagar {{ amount|cop_currency }}</span>
+        </button>
+      </div>
+    </form>
+
+    <div class="simulation-notice">
+      <small class="text-muted">🔒 Conexión segura simulada - SSL 256 bits</small>
+    </div>
+  </div>
+</section>
+
+<script>
+// Formatear número de tarjeta automáticamente
+document.getElementById('{{ form.card_number.id_for_label }}').addEventListener('input', function(e) {
+  let value = e.target.value.replaceAll(/\s/g, '');
+  let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
+  e.target.value = formattedValue;
+});
+
+// Formatear fecha de expiración
+document.getElementById('{{ form.expiry_date.id_for_label }}').addEventListener('input', function(e) {
+  let value = e.target.value.replaceAll(/\D/g, '');
+  if (value.length >= 2) {
+    value = value.slice(0, 2) + '/' + value.slice(2, 4);
+  }
+  e.target.value = value;
+});
+</script>
+{% endblock %}

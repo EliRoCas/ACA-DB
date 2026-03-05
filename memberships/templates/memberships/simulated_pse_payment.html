@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% load currency_filters %}
+
+{% block title %}Pago PSE - Simulación{% endblock %}
+
+{% block content %}
+<section class="membership-container form-page">
+  <div class="card card-custom form-card card-payment-card">
+    <header class="mb-3 text-center">
+      <div class="pse-logo">
+        <h2>PSE</h2>
+        <p>Pagos Seguros en Línea</p>
+      </div>
+      <h1 class="form-title">Realizar Pago</h1>
+      <p class="form-subtitle">Completa los datos para procesar tu pago</p>
+    </header>
+
+    <div class="payment-summary">
+      <div>
+        <strong>Miembro:</strong>
+        <span>{{ member.full_name }}</span>
+      </div>
+      <div>
+        <strong>Plan:</strong>
+        <span>{{ member.membership.name }}</span>
+      </div>
+      <div>
+        <strong>Total a Pagar:</strong>
+        <span class="payment-amount">{{ amount|cop_currency }}</span>
+      </div>
+    </div>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <div class="form-group mb-3">
+        <label class="form-label" for="{{ form.person_type.id_for_label }}">{{ form.person_type.label }}</label>
+        <div class="d-flex gap-3 mt-2">
+          {% for radio in form.person_type %}
+          <div class="form-check">
+            {{ radio.tag }}
+            <label class="form-check-label" for="{{ radio.id_for_label }}">
+              {{ radio.choice_label }}
+            </label>
+          </div>
+          {% endfor %}
+        </div>
+        {% if form.person_type.errors %}
+        <div class="field-error">{{ form.person_type.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group mb-3">
+        <label class="form-label" for="{{ form.bank.id_for_label }}">{{ form.bank.label }}</label>
+        {{ form.bank }}
+        {% if form.bank.errors %}
+        <div class="field-error">{{ form.bank.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div class="form-group mb-3">
+        <label class="form-label" for="{{ form.document_number.id_for_label }}">{{ form.document_number.label }}</label>
+        {{ form.document_number }}
+        {% if form.document_number.errors %}
+        <div class="field-error">{{ form.document_number.errors|striptags }}</div>
+        {% endif %}
+      </div>
+
+      <div class="alert alert-info mt-3">
+        <strong>ℹ️ Modo Simulación:</strong> Este es un pago simulado. No se realizará ningún cargo real.
+      </div>
+
+      <div class="form-actions mt-4">
+        <a class="btn btn-outline-custom" href="{% url 'landing' %}">Cancelar</a>
+        <button class="btn btn-primary-custom" type="submit">
+          <span>💳 Pagar {{ amount|cop_currency }}</span>
+        </button>
+      </div>
+    </form>
+
+    <div class="simulation-notice">
+      <small class="text-muted">🔒 Conexión segura simulada</small>
+    </div>
+  </div>
+</section>
+{% endblock %}

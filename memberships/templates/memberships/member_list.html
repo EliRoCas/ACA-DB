@@ -18,7 +18,7 @@
             <h2 class="h5 m-0">{{ member.full_name }}</h2>
             <small class="text-muted d-block mt-1">{{ member.document }}</small>
           </div>
-          <span class="badge" style="white-space: nowrap;">
+          <span class="badge badge-nowrap">
             {% if member.status == 'active' %}
             <span class="badge text-bg-success">Activo</span>
             {% else %}
@@ -36,6 +36,20 @@
           {% endif %}
           {% if member.membership %}
           <small class="text-muted d-block">🏋️ {{ member.membership.name }}</small>
+          {% endif %}
+          {% if member.payment_method %}
+          <small class="text-muted d-block">
+            💳 
+            {% if member.payment_method == 'cash' %}
+              Efectivo
+            {% elif member.payment_method == 'pse' %}
+              PSE
+            {% elif member.payment_method == 'card' %}
+              Tarjeta
+            {% else %}
+              {{ member.get_payment_method_display }}
+            {% endif %}
+          </small>
           {% endif %}
         </div>
 
