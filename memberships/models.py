@@ -17,11 +17,6 @@ class Membership(models.Model):
     
     
 class Member(models.Model):
-
-    STATUS_CHOICES = [
-        ('active', 'Active'),
-        ('inactive', 'Inactive'),
-    ]
     
     PAYMENT_METHOD_CHOICES = [
         ('cash', 'Efectivo'),
@@ -41,11 +36,7 @@ class Member(models.Model):
         related_name='members'
     )
 
-    status = models.CharField(
-        max_length=10,
-        choices=STATUS_CHOICES,
-        default='active'
-    )
+    status = models.BooleanField(default=True)
 
     membership_expires_at = models.DateField(null=True, blank=True)
     
@@ -68,9 +59,9 @@ class Member(models.Model):
         """Actualiza el estado del miembro basándose en la fecha de vencimiento"""
         if self.membership_expires_at:
             if self.membership_expires_at >= timezone.now().date():
-                self.status = 'active'
+                self.status = True
             else:
-                self.status = 'inactive'
+                self.status = False
         # Si no hay fecha de vencimiento, no cambiar el estado (puede ser manual)
         return self.status
     

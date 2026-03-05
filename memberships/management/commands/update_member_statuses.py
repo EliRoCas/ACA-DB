@@ -32,7 +32,7 @@ class Command(BaseCommand):
                 member.save()
                 updated_count += 1
                 
-                if member.status == 'active':
+                if member.status:
                     activated_count += 1
                     if verbose:
                         self.stdout.write(

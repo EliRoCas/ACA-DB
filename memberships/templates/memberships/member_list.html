@@ -19,7 +19,7 @@
             <small class="text-muted d-block mt-1">{{ member.document }}</small>
           </div>
           <span class="badge badge-nowrap">
-            {% if member.status == 'active' %}
+            {% if member.status %}
             <span class="badge text-bg-success">Activo</span>
             {% else %}
             <span class="badge text-bg-secondary">Inactivo</span>

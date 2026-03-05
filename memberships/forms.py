@@ -159,6 +159,19 @@ class MemberRegistrationForm(forms.ModelForm):
 
 class MemberAdminForm(forms.ModelForm):
     """Form para administradores (incluye estado y método de pago)"""
+
+    STATUS_CHOICES = [
+        (True, 'Activo'),
+        (False, 'Inactivo'),
+    ]
+
+    status = forms.TypedChoiceField(
+        choices=STATUS_CHOICES,
+        coerce=lambda value: value in (True, 'True', 'true', '1', 1),
+        widget=forms.Select,
+        label=LABEL_STATUS,
+        initial=True,
+    )
     
     PAYMENT_METHOD_CHOICES = [
         ('cash', 'Efectivo (Cambio manual de estado)'),
