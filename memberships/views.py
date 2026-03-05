@@ -342,8 +342,8 @@ class MemberListView(LoginRequiredMixin, ListView):
     login_url = "login"
     
     def get_queryset(self):
-        """Obtiene la lista de miembros sin modificar sus estados manualmente establecidos"""
-        queryset = super().get_queryset()
+        """Obtiene la lista de miembros optimizando la carga de relaciones (evita N+1)"""
+        queryset = super().get_queryset().select_related('membership')
         return queryset
 
 
