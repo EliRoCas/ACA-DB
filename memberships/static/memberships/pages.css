@@ -49,6 +49,93 @@
   text-align: center;
 }
 
+/* ============================================
+   PAYMENT SUCCESS PAGE DETAILS
+   ============================================ */
+
+.success-icon {
+  font-size: 4rem;
+  margin-bottom: 1.5rem;
+}
+
+.success-title {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.success-subtitle {
+  font-size: 1.1rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.payment-details {
+  background: #f5f5f5;
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin: 1.5rem 0;
+  text-align: left;
+}
+
+.payment-details h5 {
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.detail-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 0.95rem;
+}
+
+.detail-row:last-child {
+  border-bottom: none;
+}
+
+.status-badge {
+  display: inline-block;
+  background: #4caf50;
+  color: white;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.success-alert {
+  background: #e8f5e9;
+  border-left: 4px solid #4caf50;
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1.5rem 0;
+  color: #2e7d32;
+}
+
+.info-alert {
+  background: #e3f2fd;
+  border-left: 4px solid #2196f3;
+  padding: 1rem;
+  border-radius: 4px;
+  margin: 1.5rem 0;
+  color: #1565c0;
+}
+
+.actions {
+  margin: 2rem 0;
+}
+
+.demo-notice {
+  font-size: 0.85rem;
+  color: #999;
+  margin-top: 2rem;
+  font-style: italic;
+}
+
 .success-icon {
   font-size: 5rem;
   color: #00aa4f;

@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 from django.contrib.auth.views import LoginView
 from django.views.generic.edit import FormView
 from django.core.exceptions import PermissionDenied
-from django.shortcuts import redirect
+from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse
 from django.utils import timezone
 from django.contrib import messages
@@ -25,14 +25,14 @@ class StaffRequiredMixin(UserPassesTestMixin):
             return redirect("membership_list")
         return super().handle_no_permission()
 
-# Create your views here.
+
 class LandingPageView(TemplateView):
     template_name = 'landing.html'
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['memberships'] = Membership.objects.all().order_by('price')
-        context['member_count'] = 150  # Ejemplo
+        context['member_count'] = 150  
         return context
 
 class MembershipListView(LoginRequiredMixin, ListView):
@@ -234,10 +234,11 @@ class MemberRegisterSuccessView(TemplateView):
         payment_method = self.request.session.get('pending_payment_method', 'cash')
         context['payment_method'] = payment_method
         
-        # Limpiar sesión
+        # Limpiar sesión (ahora también payment_processed para próximo flujo)
         self.request.session.pop('pending_member_id', None)
         self.request.session.pop('pending_membership_id', None)
         self.request.session.pop('pending_payment_method', None)
+        self.request.session.pop('payment_processed', None)
         
         return context
 
@@ -257,7 +258,7 @@ class SimulatedPSEPaymentView(FormView):
         context = super().get_context_data(**kwargs)
         member_id = self.request.session.get('pending_member_id')
         if member_id:
-            member = Member.objects.get(id=member_id)
+            member = get_object_or_404(Member, id=member_id)
             context['member'] = member
             context['amount'] = member.membership.price if member.membership else 0
         return context
@@ -265,15 +266,32 @@ class SimulatedPSEPaymentView(FormView):
     def form_valid(self, form):
         # Simular procesamiento de pago PSE
         member_id = self.request.session.get('pending_member_id')
-        member = Member.objects.get(id=member_id)
+        
+        # Proteger contra doble submit: validar flag en sesión
+        if self.request.session.get('payment_processed'):
+            return redirect('payment_success')
+        
+        member = get_object_or_404(Member, id=member_id)
+        
+        # Validar que no exista pago reciente (defensa N+1)
+        recent_payment = Payment.objects.filter(
+            member=member,
+            created_at__gte=timezone.now() - timedelta(minutes=5)
+        ).exists()
+        
+        if recent_payment:
+            # Pago ya existe, redirigir a éxito
+            return redirect('payment_success')
         
         # Crear pago simulado
         if member.membership:
             Payment.objects.create(
                 member=member,
                 amount=member.membership.price,
-                method='transfer',  # PSE es transferencia
+                method='transfer',  
             )
+            # Marcar como procesado en sesión
+            self.request.session['payment_processed'] = True
         
         return redirect('payment_success')
 
@@ -293,7 +311,7 @@ class SimulatedCardPaymentView(FormView):
         context = super().get_context_data(**kwargs)
         member_id = self.request.session.get('pending_member_id')
         if member_id:
-            member = Member.objects.get(id=member_id)
+            member = get_object_or_404(Member, id=member_id)
             context['member'] = member
             context['amount'] = member.membership.price if member.membership else 0
         return context
@@ -301,7 +319,22 @@ class SimulatedCardPaymentView(FormView):
     def form_valid(self, form):
         # Simular procesamiento de pago con tarjeta
         member_id = self.request.session.get('pending_member_id')
-        member = Member.objects.get(id=member_id)
+        
+        # Proteger contra doble submit: validar flag en sesión
+        if self.request.session.get('payment_processed'):
+            return redirect('payment_success')
+        
+        member = get_object_or_404(Member, id=member_id)
+        
+        # Validar que no exista pago reciente (defensa N+1)
+        recent_payment = Payment.objects.filter(
+            member=member,
+            created_at__gte=timezone.now() - timedelta(minutes=5)
+        ).exists()
+        
+        if recent_payment:
+            # Pago ya existe, redirigir a éxito
+            return redirect('payment_success')
         
         # Crear pago simulado
         if member.membership:
@@ -310,6 +343,8 @@ class SimulatedCardPaymentView(FormView):
                 amount=member.membership.price,
                 method='card',
             )
+            # Marcar como procesado en sesión
+            self.request.session['payment_processed'] = True
         
         return redirect('payment_success')
 
@@ -322,13 +357,14 @@ class PaymentSuccessView(TemplateView):
         context = super().get_context_data(**kwargs)
         member_id = self.request.session.get('pending_member_id')
         if member_id:
-            member = Member.objects.get(id=member_id)
+            member = get_object_or_404(Member, id=member_id)
             context['member'] = member
         
         # Limpiar sesión
         self.request.session.pop('pending_member_id', None)
         self.request.session.pop('pending_membership_id', None)
         self.request.session.pop('pending_payment_method', None)
+        self.request.session.pop('payment_processed', None)
         
         return context
 
