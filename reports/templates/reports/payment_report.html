@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+<h2>Reporte de Pagos</h2>
+
+<table class="table table-striped">
+<thead>
+<tr>
+<th>Miembro</th>
+<th>Monto</th>
+<th>Fecha</th>
+<th>Método</th>
+</tr>
+</thead>
+
+<tbody>
+{% for payment in payments %}
+<tr>
+<td>{{ payment.member.full_name }}</td>
+<td>${{ payment.amount }}</td>
+<td>{{ payment.created_at }}</td>
+<td>{{ payment.payment_method }}</td>
+</tr>
+{% endfor %}
+</tbody>
+
+</table>
+
+</div>
+
+{% endblock %}

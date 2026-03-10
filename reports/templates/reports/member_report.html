@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+<h2>Reporte de Miembros</h2>
+
+<div class="row mb-4">
+
+<div class="col-md-4">
+<div class="card text-center">
+<div class="card-body">
+<h5 class="card-title">Total Miembros</h5>
+<h3>{{ total_members }}</h3>
+</div>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="card text-center">
+<div class="card-body">
+<h5 class="card-title">Activos</h5>
+<h3>{{ active_members }}</h3>
+</div>
+</div>
+</div>
+
+<div class="col-md-4">
+<div class="card text-center">
+<div class="card-body">
+<h5 class="card-title">Inactivos</h5>
+<h3>{{ inactive_members }}</h3>
+</div>
+</div>
+</div>
+
+</div>
+
+<form method="get" class="row g-3 align-items-end mb-4">
+
+<div class="col-auto">
+
+<label class="form-label">Filtrar por estado</label>
+
+<select name="status" class="form-select">
+
+<option value="">Todos</option>
+
+<option value="active"
+{% if status_filter == "active" %}
+selected
+{% endif %}
+>
+Activos
+</option>
+
+<option value="inactive"
+{% if status_filter == "inactive" %}
+selected
+{% endif %}
+>
+Inactivos
+</option>
+
+</select>
+
+</div>
+
+<div class="col-auto">
+
+<button type="submit" class="btn btn-primary">
+Filtrar
+</button>
+
+<a href="{% url 'member_report' %}" class="btn btn-secondary">
+Limpiar
+</a>
+
+</div>
+
+</form>
+
+<a href="{% url 'export_members_excel' %}?status={{ status_filter }}" class="btn btn-success mb-3">
+Exportar a Excel
+</a>
+
+
+<table class="table table-striped">
+
+<thead>
+<tr>
+<th>Nombre</th>
+<th>Documento</th>
+<th>Email</th>
+<th>Membresía</th>
+<th>Estado</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for member in members %}
+<tr>
+<td>{{ member.full_name }}</td>
+<td>{{ member.document }}</td>
+<td>{{ member.email }}</td>
+<td>{{ member.membership.name }}</td>
+<td>
+
+{% if member.status == "active" %}
+
+<span class="badge bg-success">Activo</span>
+
+{% else %}
+
+<span class="badge bg-danger">Inactivo</span>
+
+{% endif %}
+
+</td>
+</tr>
+{% endfor %}
+
+</tbody>
+
+</table>
+
+</div>
+
+{% endblock %}
