@@ -249,7 +249,6 @@ R: Simplemente genera una nueva ejecutando el comando de nuevo en el paso 5 y ac
 
 Si tienes dudas o problemas:
 1. Revisa esta guía nuevamente
-2. Consulta con el líder del proyecto
-3. Abre un issue en GitHub con detalles del error
+2. Abre un issue en GitHub con detalles del error
 
 **¡Bienvenida al equipo FitGym!** 🎉
