@@ -10,18 +10,18 @@ def member_report(request):
     status = request.GET.get('status')
 
     if status == "active":
-        members = Member.objects.filter(status="active")
+        members = Member.objects.filter(status=True)
 
     elif status == "inactive":
-        members = Member.objects.filter(status="inactive")
+        members = Member.objects.filter(status=False)
 
     else:
         members = Member.objects.all()
 
     # estadísticas
     total_members = Member.objects.count()
-    active_members = Member.objects.filter(status="active").count()
-    inactive_members = Member.objects.filter(status="inactive").count()
+    active_members = Member.objects.filter(status=True).count()
+    inactive_members = Member.objects.filter(status=False).count()
 
     context = {
         "members": members,
@@ -38,9 +38,9 @@ def export_members_excel(request):
     
     status = request.GET.get('status')
     if status == "active":
-        members = Member.objects.filter(status="active")
+        members = Member.objects.filter(status=True)
     elif status == "inactive":
-        members = Member.objects.filter(status="inactive")
+        members = Member.objects.filter(status=False)
     else:
         members = Member.objects.all()
 
