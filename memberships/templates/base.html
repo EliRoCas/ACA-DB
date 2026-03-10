@@ -66,7 +66,7 @@
                 <a
                   class="nav-link"
                   href="/"
-                  >Inicio</a
+                  >🏠 Inicio</a
                 >
               </li>
               {% endif %}
@@ -75,7 +75,7 @@
                 <a
                   class="nav-link"
                   href="/#planes"
-                  >Planes</a
+                  >💪 Planes</a
                 >
               </li>
               {% elif user.is_staff %}
@@ -83,21 +83,28 @@
                 <a
                   class="nav-link"
                   href="{% url 'member_list' %}"
-                  >Miembros</a
+                  >👥 Miembros</a
                 >
               </li>
               <li class="nav-item">
                 <a
                   class="nav-link"
                   href="{% url 'membership_list' %}"
-                  >Membresías</a
+                  >🏷️ Membresías</a
                 >
               </li>
               <li class="nav-item">
                 <a
                   class="nav-link"
                   href="{% url 'admin_user_list' %}"
-                  >Usuarios Admin</a
+                  >🔑 Usuarios Admin</a
+                >
+              </li>
+              <li class="nav-item">
+                <a
+                  class="nav-link"
+                  href="{% url 'member_report' %}"
+                  >📊 Reportes</a
                 >
               </li>
               {% endif %}
@@ -113,13 +120,13 @@
                 >
                 <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="createDropdown">
                   <li>
-                    <a class="dropdown-item" href="{% url 'membership_create' %}">+ Crear Plan de Membresía</a>
+                    <a class="dropdown-item" href="{% url 'membership_create' %}">🏷️ Crear Plan de Membresía</a>
                   </li>
                   <li>
-                    <a class="dropdown-item" href="{% url 'member_create' %}">+ Agregar Miembro</a>
+                    <a class="dropdown-item" href="{% url 'member_create' %}">👤 Agregar Miembro</a>
                   </li>
                   <li>
-                    <a class="dropdown-item" href="{% url 'admin_user_create' %}">+ Crear Usuario Admin</a>
+                    <a class="dropdown-item" href="{% url 'admin_user_create' %}">🔑 Crear Usuario Admin</a>
                   </li>
                 </ul>
               </li>
